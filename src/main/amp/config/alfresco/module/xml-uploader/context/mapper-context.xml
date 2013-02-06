@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <bean id="configuredMarshaller"
+        class="org.alfresco.repo.bulkimport.xml.AlfrescoXStreamMarshaller">
+    <constructor-arg value="alf_data_dev/xml"/>
+    <constructor-arg ref="ServiceRegistry"/>
+    <property name="autodetectAnnotations" value="true"/>
+    <property name="annotatedClasses">
+      <list>
+        <value>org.alfresco.repo.bulkimport.beans.Content</value>
+      </list>
+    </property>
+  </bean>
+
+</beans>
