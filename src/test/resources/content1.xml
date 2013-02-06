@@ -3,4 +3,5 @@
   <title>Content Title</title>
   <description>the most awesome content ever</description>
   <isVersionable>true</isVersionable>
+  <contentUrl>http://www.selab.isti.cnr.it/ws-mate/example.pdf</contentUrl>
 </content>

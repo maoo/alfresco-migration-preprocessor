@@ -3,10 +3,7 @@ package org.alfresco.repo.bulkimport.xml;
 import com.google.gdata.util.common.base.StringUtil;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.bulkimport.MetadataLoader;
-import org.alfresco.repo.bulkimport.annotations.NodeAspect;
-import org.alfresco.repo.bulkimport.annotations.NodeParent;
-import org.alfresco.repo.bulkimport.annotations.NodeProperty;
-import org.alfresco.repo.bulkimport.annotations.NodeType;
+import org.alfresco.repo.bulkimport.annotations.*;
 import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
 
@@ -124,6 +121,14 @@ public class AlfrescoReflectionUtils {
     return new File(fileImportRootLocation, metaFileName);
   }
 
+  public static File getBinaryFile(Map<QName, Serializable> nodeProperties, File fileImportRootLocation) {
+    String name = (String) nodeProperties.get(ContentModel.PROP_NAME);
+    if (StringUtil.isEmpty(name)) {
+      name = (new Date()).getTime() + ".bin";
+    }
+    return new File(fileImportRootLocation, name);
+  }
+
   public static boolean isContainer(Class currentClass) {
     boolean ret = currentClass.getAnnotation(NodeParent.class) != null;
     log.debug("[AlfrescoReflectionUtils] isContainer " + currentClass + "? " + ret);
@@ -139,6 +144,16 @@ public class AlfrescoReflectionUtils {
     return folder;
   }
 
+  public static String getContentUrl(Object currentObject) throws IllegalAccessException {
+    for (Field field : currentObject.getClass().getDeclaredFields()) {
+      field.setAccessible(true);
+      NodeContentUrl contentUrlAnnotation = field.getAnnotation(NodeContentUrl.class);
+      if (contentUrlAnnotation != null) {
+        return (String)field.get(currentObject);
+      }
+    }
+    return null;
+  }
 
 //  ParameterizedType integerListType = (ParameterizedType) integerListField.getGenericType();
 //  Class<?> integerListClass = (Class<?>) integerListType.getActualTypeArguments()[0];

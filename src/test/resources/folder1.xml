@@ -9,18 +9,21 @@
       <title>Content Title 1</title>
       <description>the most awesome content ever 1</description>
       <isVersionable>true</isVersionable>
+      <contentUrl>http://www.scala-lang.org/docu/files/ScalaByExample.pdf</contentUrl>
     </content>
     <content>
       <name>contentname2</name>
       <title>Content Title 2</title>
       <description>the most awesome content ever 2</description>
       <isVersionable>true</isVersionable>
+      <contentUrl>http://www.tug.org/pracjourn/2005-4/mertz/mertz.pdf</contentUrl>
     </content>
     <content>
       <name>contentname3</name>
       <title>Content Title 3</title>
       <description>the most awesome content ever 3</description>
       <isVersionable>true</isVersionable>
+      <contentUrl>http://www.jemander.se/MercurialByExample.pdf</contentUrl>
     </content>
   </children>
 </folder>

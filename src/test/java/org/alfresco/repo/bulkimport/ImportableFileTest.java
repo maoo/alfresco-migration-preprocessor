@@ -12,9 +12,7 @@ import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.*;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ApplicationContextHelper;
 import org.apache.log4j.Logger;
@@ -54,6 +52,7 @@ public class ImportableFileTest {
   private static BulkFilesystemImporter bulkImporter;
   private static Repository repositoryHelper;
   private static FileFolderService fileFolderService;
+  private static ContentService contentService;
 
   @BeforeClass
   public static void initAppContext() {
@@ -66,6 +65,7 @@ public class ImportableFileTest {
     bulkImporter = (MultiThreadedBulkFilesystemImporter)applicationContext.getBean("bulkFilesystemImporter");
     repositoryHelper = (Repository)applicationContext.getBean("repositoryHelper");
     fileFolderService = (FileFolderService)applicationContext.getBean("FileFolderService");
+    contentService = (ContentService)applicationContext.getBean("ContentService");
 
     AuthenticationUtil.setFullyAuthenticatedUser(ADMIN_USER_NAME);
   }
@@ -89,6 +89,8 @@ public class ImportableFileTest {
     Map<QName, Serializable> nodeProperties = AlfrescoReflectionUtils.getAlfrescoMeta(unmarshalled);
     File metaFile = AlfrescoReflectionUtils.getMetaFile(nodeProperties,marshaller.getFileImportRootLocation());
     assertTrue(metaFile.exists());
+    File binaryFile = AlfrescoReflectionUtils.getBinaryFile(nodeProperties,marshaller.getFileImportRootLocation());
+    assertTrue(binaryFile.exists());
   }
 
   @Test
@@ -132,12 +134,14 @@ public class ImportableFileTest {
 
   private void assertContent(NodeRef nodeRef) {
     assertEquals(ContentModel.TYPE_CONTENT, nodeService.getType(nodeRef));
-    assertEquals("folder", nodeService.getProperty(nodeRef,ContentModel.PROP_NAME));
     assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE));
     assertTrue(nodeService.hasAspect(nodeRef,ContentModel.ASPECT_GEN_CLASSIFIABLE));
     assertTrue(nodeService.hasAspect(nodeRef,ContentModel.ASPECT_AUDITABLE));
     assertTrue(((String)nodeService.getProperty(nodeRef,ContentModel.PROP_NAME)).startsWith("contentname"));
     assertTrue(((String)nodeService.getProperty(nodeRef,ContentModel.PROP_TITLE)).startsWith("Content Title"));
+    ContentReader reader = contentService.getReader(nodeRef,ContentModel.PROP_CONTENT);
+    assertNotNull(reader);
+    assertNotNull(reader.getContentInputStream());
   }
 
   private void assertFolder(FileInfo fileInfo) {

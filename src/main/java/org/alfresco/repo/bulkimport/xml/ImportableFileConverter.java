@@ -108,9 +108,14 @@ public class ImportableFileConverter implements Converter {
         currentFolder.renameTo(new File(parent,name));
         context.put(CURRENT_FOLDER_CONTEXT_PARAM,parent);
         log.debug(
-            "[ImportableFileConverter.assCompletionCallback] folder " +
+            "[ImportableFileConverter] folder " +
                 currentFolder +
                 "completed; adding parent as new root");
+      } else {
+        String contentUrl = AlfrescoReflectionUtils.getContentUrl(currentObject);
+        log.debug("[ImportableFileConverter] importing content from url " + contentUrl);
+        File metaFile = AlfrescoReflectionUtils.getBinaryFile(nodeProperties, fileImportCurrentLocation);
+        AlfrescoFileImportUtils.fetchBinaryContent(metaFile,contentUrl);
       }
 
       //Handling meta File creation

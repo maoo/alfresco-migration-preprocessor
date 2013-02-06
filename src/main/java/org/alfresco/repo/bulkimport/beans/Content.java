@@ -2,6 +2,7 @@ package org.alfresco.repo.bulkimport.beans;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import org.alfresco.repo.bulkimport.annotations.NodeAspect;
+import org.alfresco.repo.bulkimport.annotations.NodeContentUrl;
 import org.alfresco.repo.bulkimport.annotations.NodeProperty;
 import org.alfresco.repo.bulkimport.annotations.NodeType;
 
@@ -22,6 +23,9 @@ public final class Content {
 
   @NodeProperty
   private String description;
+
+  @NodeContentUrl
+  private String contentUrl;
 
   @NodeAspect
   @XStreamAlias("isVersionable")
@@ -66,5 +70,13 @@ public final class Content {
 
   public void setVersionable(String versionable) {
     this.versionable = versionable;
+  }
+
+  public String getContentUrl() {
+    return contentUrl;
+  }
+
+  public void setContentUrl(String contentUrl) {
+    this.contentUrl = contentUrl;
   }
 }
