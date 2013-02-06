@@ -142,16 +142,15 @@ public class ImportableFileTest {
 
   private void assertFolder(FileInfo fileInfo) {
     NodeRef nodeRef = fileInfo.getNodeRef();
-//    assertEquals(ContentModel.TYPE_FOLDER, nodeService.getType(nodeRef));
-//    assertEquals("folder", nodeService.getProperty(nodeRef,ContentModel.PROP_NAME));
-//    assertTrue(nodeService.hasAspect(nodeRef,ContentModel.ASPECT_VERSIONABLE));
-//    assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_GEN_CLASSIFIABLE));
-//    assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_AUDITABLE));
-//    assertEquals("foldername",nodeService.getProperty(nodeRef,ContentModel.PROP_NAME));
-//    assertEquals("Folder Title",nodeService.getProperty(nodeRef,ContentModel.PROP_TITLE));
-//    List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef);
-//    for(ChildAssociationRef child : children) {
-//      assertContent(child.getChildRef());
-//    }
+    assertEquals(ContentModel.TYPE_FOLDER, nodeService.getType(nodeRef));
+    assertTrue(nodeService.hasAspect(nodeRef,ContentModel.ASPECT_VERSIONABLE));
+    assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_GEN_CLASSIFIABLE));
+    assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_AUDITABLE));
+    assertEquals("foldername",nodeService.getProperty(nodeRef,ContentModel.PROP_NAME));
+    assertEquals("Folder Title",nodeService.getProperty(nodeRef,ContentModel.PROP_TITLE));
+    List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef);
+    for(ChildAssociationRef child : children) {
+      assertContent(child.getChildRef());
+    }
   }
 }
