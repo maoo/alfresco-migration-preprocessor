@@ -1,0 +1,7 @@
+alf_data_dev
+target
+*.iml
+.idea
+*.ipr
+*.iws
+.classpath
