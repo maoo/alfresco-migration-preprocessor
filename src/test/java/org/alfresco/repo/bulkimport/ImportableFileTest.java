@@ -1,6 +1,7 @@
 package org.alfresco.repo.bulkimport;
 
 import org.alfresco.repo.bulkimport.beans.Content;
+import org.alfresco.repo.bulkimport.beans.Folder;
 import org.alfresco.repo.bulkimport.xml.AlfrescoReflectionUtils;
 import org.alfresco.repo.bulkimport.xml.AlfrescoXStreamMarshaller;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -40,6 +41,7 @@ public class ImportableFileTest {
   protected static NodeService nodeService;
 
   private static URL content1 = ClassLoader.getSystemClassLoader().getResource("content1.xml");
+  private static URL folder1 = ClassLoader.getSystemClassLoader().getResource("folder1.xml");
 
   @BeforeClass
   public static void initAppContext() {
@@ -57,7 +59,7 @@ public class ImportableFileTest {
   }
 
   @Test
-  public void unmarshalObject() throws IOException {
+  public void unmarshalContent() throws IOException {
     Source source = new StreamSource(content1.openStream());
     Object unmarshalled = marshaller.unmarshal(source);
     assertEquals(Content.class, unmarshalled.getClass());
@@ -72,4 +74,10 @@ public class ImportableFileTest {
     assertTrue(metaFile.exists());
   }
 
+  @Test
+  public void unmarshalFolder() throws IOException {
+    Source source = new StreamSource(folder1.openStream());
+    Folder folder = (Folder)marshaller.unmarshal(source);
+    assertEquals(3,folder.getChildren().size());
+  }
 }

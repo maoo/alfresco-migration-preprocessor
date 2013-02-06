@@ -1,6 +1,6 @@
 <content>
-  <name>mao.txt</name>
-  <title>mao's content</title>
+  <name>contentname</name>
+  <title>Content Title</title>
   <description>the most awesome content ever</description>
   <isVersionable>true</isVersionable>
 </content>

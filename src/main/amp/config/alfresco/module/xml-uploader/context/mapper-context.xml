@@ -8,10 +8,11 @@
         class="org.alfresco.repo.bulkimport.xml.AlfrescoXStreamMarshaller">
     <constructor-arg value="alf_data_dev/xml"/>
     <constructor-arg ref="ServiceRegistry"/>
-    <property name="autodetectAnnotations" value="true"/>
+    <!--<property name="autodetectAnnotations" value="true"/>-->
     <property name="annotatedClasses">
       <list>
         <value>org.alfresco.repo.bulkimport.beans.Content</value>
+        <value>org.alfresco.repo.bulkimport.beans.Folder</value>
       </list>
     </property>
   </bean>

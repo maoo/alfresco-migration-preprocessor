@@ -4,6 +4,7 @@ import com.google.gdata.util.common.base.StringUtil;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.bulkimport.MetadataLoader;
 import org.alfresco.repo.bulkimport.annotations.NodeAspect;
+import org.alfresco.repo.bulkimport.annotations.NodeParent;
 import org.alfresco.repo.bulkimport.annotations.NodeProperty;
 import org.alfresco.repo.bulkimport.annotations.NodeType;
 import org.alfresco.service.namespace.QName;
@@ -123,6 +124,24 @@ public class AlfrescoReflectionUtils {
     return new File(fileImportRootLocation, metaFileName);
   }
 
+  public static boolean isContainer(Class currentClass) {
+    boolean ret = currentClass.getAnnotation(NodeParent.class) != null;
+    log.debug("[AlfrescoReflectionUtils] isContainer " + currentClass + "? " + ret);
+    return ret;
+  }
+
+  public static File getFolder(String folderName, File fileImportRootLocation) {
+    if (StringUtil.isEmpty(folderName)) {
+      folderName = (new Date()).getTime() + "";
+    }
+    File folder = new File(fileImportRootLocation, folderName);
+    folder.mkdir();
+    return folder;
+  }
+
+
+//  ParameterizedType integerListType = (ParameterizedType) integerListField.getGenericType();
+//  Class<?> integerListClass = (Class<?>) integerListType.getActualTypeArguments()[0];
 
   //@TODO - set aspects and type here
 
