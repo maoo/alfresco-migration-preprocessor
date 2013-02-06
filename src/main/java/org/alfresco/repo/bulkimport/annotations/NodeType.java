@@ -9,5 +9,5 @@ public @interface NodeType {
 
   String namespace() default "";
 
-  String[] aspects() default {"{http://www.alfresco.org/model/content/1.0}auditable","{http://www.alfresco.org/model/content/1.0}generalClassifiable"};
+  String[] aspects() default {};
 }

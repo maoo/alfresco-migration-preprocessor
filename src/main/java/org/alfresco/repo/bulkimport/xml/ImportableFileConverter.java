@@ -111,20 +111,21 @@ public class ImportableFileConverter implements Converter {
             "[ImportableFileConverter.assCompletionCallback] folder " +
                 currentFolder +
                 "completed; adding parent as new root");
-      } else {
-        //Handling meta filename and File creation
-        File metaFile = AlfrescoReflectionUtils.getMetaFile(nodeProperties, fileImportCurrentLocation);
-
-        log.debug(
-            "[ImportableFileConverter.unmarshal] current class: " + currentClass +
-                "current object: " + currentObject +
-                "alfresco properties: " + nodeProperties +
-                "meta File: " + metaFile.getAbsolutePath());
-
-        //Store Properties into file
-        fos = new FileOutputStream(metaFile);
-        properties.storeToXML(fos, null);
       }
+
+      //Handling meta File creation
+      File metaFile = AlfrescoReflectionUtils.getMetaFile(nodeProperties, fileImportCurrentLocation);
+
+      log.debug(
+          "[ImportableFileConverter.unmarshal] current class: " + currentClass +
+              "current object: " + currentObject +
+              "alfresco properties: " + nodeProperties +
+              "meta File: " + metaFile.getAbsolutePath());
+
+      //Store Properties into file
+      fos = new FileOutputStream(metaFile);
+      properties.storeToXML(fos, null);
+
     } catch (InvocationTargetException e) {
       handleException(currentClass, e);
     } catch (IllegalAccessException e) {

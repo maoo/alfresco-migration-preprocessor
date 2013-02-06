@@ -6,7 +6,12 @@ import org.alfresco.repo.bulkimport.annotations.NodeProperty;
 import org.alfresco.repo.bulkimport.annotations.NodeType;
 
 @XStreamAlias("content")
-@NodeType(name = "content", namespace = "http://www.alfresco.org/model/content/1.0")
+@NodeType(
+    name = "content",
+    namespace = "http://www.alfresco.org/model/content/1.0",
+    aspects = {
+        "{http://www.alfresco.org/model/content/1.0}auditable",
+        "{http://www.alfresco.org/model/content/1.0}generalclassifiable"})
 public final class Content {
 
   @NodeProperty
