@@ -1,17 +1,18 @@
-package org.alfresco.repo.bulkimport.xml;
+package org.alfresco.repo.bulkimport.utils;
 
 import com.google.gdata.util.common.base.StringUtil;
-import org.alfresco.model.ContentModel;
-import org.alfresco.repo.bulkimport.MetadataLoader;
 import org.alfresco.repo.bulkimport.annotations.*;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.Triple;
 import org.apache.log4j.Logger;
 
-import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AlfrescoReflectionUtils {
 
@@ -36,15 +37,15 @@ public class AlfrescoReflectionUtils {
           String nodePropertyName = nodeProperty.name();
           String namespace = (!StringUtil.isEmpty(nodePropertyNamespace)) ? nodePropertyNamespace : typeNamespace;
           String propertyName = (!StringUtil.isEmpty(nodePropertyName)) ? nodePropertyName : fieldName;
-          Serializable propertyValue = (Serializable)field.get(obj);
+          Serializable propertyValue = (Serializable) field.get(obj);
           QName nsQname = QName.createQName(namespace, propertyName);
 
           log.debug("[Parsing Alfresco Meta] " +
-              "Class "+obj.getClass() +
-              " , TypeNamespace "+typeNamespace +
-              " , Field name "+fieldName +
-              " , NodePropName "+nodePropertyName +
-              " , NodePropNamespace "+nodePropertyNamespace);
+              "Class " + obj.getClass() +
+              " , TypeNamespace " + typeNamespace +
+              " , Field name " + fieldName +
+              " , NodePropName " + nodePropertyName +
+              " , NodePropNamespace " + nodePropertyNamespace);
 
           ret.put(nsQname, propertyValue);
           log.debug("[Added Alfresco Meta] Namespace " + namespace + " , propertyName" + propertyName + " , value" + propertyValue);
@@ -59,9 +60,9 @@ public class AlfrescoReflectionUtils {
     if (nodeType != null) {
       String typeNamespace = nodeType.namespace();
       String typeName = nodeType.name();
-      return QName.createQName(typeNamespace,typeName);
+      return QName.createQName(typeNamespace, typeName);
     } else {
-      throw new IllegalAccessException("Object "+obj+" does not contain @NodeType annocation");
+      throw new IllegalAccessException("Object " + obj + " does not contain @NodeType annocation");
     }
   }
 
@@ -70,11 +71,11 @@ public class AlfrescoReflectionUtils {
     NodeType nodeType = obj.getClass().getAnnotation(NodeType.class);
     if (nodeType != null) {
       String[] aspects = nodeType.aspects();
-      for(String aspect : aspects) {
+      for (String aspect : aspects) {
         ret.add(QName.createQName(aspect));
       }
     } else {
-      throw new IllegalAccessException("Object "+obj+" does not contain @NodeType annocation");
+      throw new IllegalAccessException("Object " + obj + " does not contain @NodeType annocation");
     }
     return ret;
   }
@@ -94,7 +95,7 @@ public class AlfrescoReflectionUtils {
         String nodeAspectName = nodeAspect.name();
         String namespace = (!StringUtil.isEmpty(nodeAspectNamespace)) ? nodeAspectNamespace : typeNamespace;
         String aspectName = (!StringUtil.isEmpty(nodeAspectName)) ? nodeAspectName : fieldName;
-        Serializable fieldValue = (Serializable)field.get(obj);
+        Serializable fieldValue = (Serializable) field.get(obj);
 
         log.debug("[Parsing Alfresco Aspects] " +
             "Class " + obj.getClass() +
@@ -104,29 +105,12 @@ public class AlfrescoReflectionUtils {
             " , NodePropNamespace " + nodeAspectNamespace);
 
         if (fieldValue != null) {
-          aspects.add(QName.createQName(namespace,aspectName));
+          aspects.add(QName.createQName(namespace, aspectName));
           log.debug("[Added Alfresco Aspect] Namespace " + namespace + " , aspectName" + aspectName);
         }
       }
     }
     return aspects.toArray(new QName[]{});
-  }
-
-  public static File getMetaFile(Map<QName, Serializable> nodeProperties, File fileImportRootLocation) {
-    String name = (String) nodeProperties.get(ContentModel.PROP_NAME);
-    if (StringUtil.isEmpty(name)) {
-      name = (new Date()).getTime() + ".bin";
-    }
-    String metaFileName = name + MetadataLoader.METADATA_SUFFIX + AlfrescoReflectionUtils.METADATA_FILE_EXTENSION;
-    return new File(fileImportRootLocation, metaFileName);
-  }
-
-  public static File getBinaryFile(Map<QName, Serializable> nodeProperties, File fileImportRootLocation) {
-    String name = (String) nodeProperties.get(ContentModel.PROP_NAME);
-    if (StringUtil.isEmpty(name)) {
-      name = (new Date()).getTime() + ".bin";
-    }
-    return new File(fileImportRootLocation, name);
   }
 
   public static boolean isContainer(Class currentClass) {
@@ -135,30 +119,38 @@ public class AlfrescoReflectionUtils {
     return ret;
   }
 
-  public static File getFolder(String folderName, File fileImportRootLocation) {
-    if (StringUtil.isEmpty(folderName)) {
-      folderName = (new Date()).getTime() + "";
-    }
-    File folder = new File(fileImportRootLocation, folderName);
-    folder.mkdir();
-    return folder;
-  }
-
   public static String getContentUrl(Object currentObject) throws IllegalAccessException {
     for (Field field : currentObject.getClass().getDeclaredFields()) {
       field.setAccessible(true);
       NodeContentUrl contentUrlAnnotation = field.getAnnotation(NodeContentUrl.class);
       if (contentUrlAnnotation != null) {
-        return (String)field.get(currentObject);
+        return (String) field.get(currentObject);
       }
     }
     return null;
   }
 
-//  ParameterizedType integerListType = (ParameterizedType) integerListField.getGenericType();
-//  Class<?> integerListClass = (Class<?>) integerListType.getActualTypeArguments()[0];
-
-  //@TODO - set aspects and type here
+  public static List<Triple<QName, QName, String>> getAlfrescoAssocs(Object currentObject) {
+    List<Triple<QName,QName,String>> ret = new ArrayList<Triple<QName,QName,String>>();
+    for (Field field : currentObject.getClass().getDeclaredFields()) {
+      NodeAssociation nodeAssociation = field.getAnnotation(NodeAssociation.class);
+      if (nodeAssociation != null) {
+        String fkPropertyName = nodeAssociation.fkPropertyName();
+        String fkPropertyType = nodeAssociation.fkPropertyType();
+        String fieldName = nodeAssociation.fieldName();
+        if (!StringUtil.isEmpty(fkPropertyName) &&
+            !StringUtil.isEmpty(fkPropertyType) &&
+            !StringUtil.isEmpty(fieldName)) {
+          ret.add(new Triple<QName, QName, String>(
+              QName.createQName(fkPropertyName),
+              QName.createQName(fkPropertyType),
+              fieldName
+          ));
+        }
+      }
+    }
+    return ret;
+  }
 
 //  public static <T> Object getBean(NodeService nodeService, NodeRef nodeRef, Class<T> clazz) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchMethodException {
 //    T bean = clazz.newInstance();
@@ -187,14 +179,5 @@ public class AlfrescoReflectionUtils {
 //      }
 //    }
 //    return bean;
-//  }
-
-//  public static <T> T unmarshal(InputStream xmlStream, Class<T> clazz) throws JAXBException {
-//    JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
-//    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-//    Binder<Node> binder = jaxbContext.createBinder();
-//    JAXBIntrospector intro = jaxbContext.createJAXBIntrospector();
-//    //intro.
-//    return (T) jaxbUnmarshaller.unmarshal(xmlStream);
 //  }
 }

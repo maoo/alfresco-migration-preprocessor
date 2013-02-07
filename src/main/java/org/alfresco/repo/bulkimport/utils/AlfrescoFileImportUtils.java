@@ -1,7 +1,9 @@
-package org.alfresco.repo.bulkimport.xml;
+package org.alfresco.repo.bulkimport.utils;
 
-import org.alfresco.service.cmr.repository.ContentService;
-import org.alfresco.service.cmr.repository.NodeService;
+import com.google.gdata.util.common.base.StringUtil;
+import org.alfresco.model.ContentModel;
+import org.alfresco.repo.bulkimport.MetadataLoader;
+import org.alfresco.service.namespace.QName;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
@@ -9,6 +11,8 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Logger;
 
 import java.io.*;
+import java.util.Date;
+import java.util.Map;
 
 public class AlfrescoFileImportUtils {
 
@@ -51,5 +55,31 @@ public class AlfrescoFileImportUtils {
         }
       }
     }
+  }
+
+  public static File getMetaFile(Map<QName, Serializable> nodeProperties, File fileImportRootLocation) {
+    String name = (String) nodeProperties.get(ContentModel.PROP_NAME);
+    if (StringUtil.isEmpty(name)) {
+      name = (new Date()).getTime() + ".bin";
+    }
+    String metaFileName = name + MetadataLoader.METADATA_SUFFIX + AlfrescoReflectionUtils.METADATA_FILE_EXTENSION;
+    return new File(fileImportRootLocation, metaFileName);
+  }
+
+  public static File getBinaryFile(Map<QName, Serializable> nodeProperties, File fileImportRootLocation) {
+    String name = (String) nodeProperties.get(ContentModel.PROP_NAME);
+    if (StringUtil.isEmpty(name)) {
+      name = (new Date()).getTime() + ".bin";
+    }
+    return new File(fileImportRootLocation, name);
+  }
+
+  public static File getFolder(String folderName, File fileImportRootLocation) {
+    if (StringUtil.isEmpty(folderName)) {
+      folderName = (new Date()).getTime() + "";
+    }
+    File folder = new File(fileImportRootLocation, folderName);
+    folder.mkdir();
+    return folder;
   }
 }

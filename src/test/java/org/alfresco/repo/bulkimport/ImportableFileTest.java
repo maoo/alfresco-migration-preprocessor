@@ -5,8 +5,8 @@ import org.alfresco.repo.bulkimport.beans.Content;
 import org.alfresco.repo.bulkimport.beans.Folder;
 import org.alfresco.repo.bulkimport.impl.MultiThreadedBulkFilesystemImporter;
 import org.alfresco.repo.bulkimport.impl.StreamingNodeImporterFactory;
-import org.alfresco.repo.bulkimport.impl.StripingFilesystemTracker;
-import org.alfresco.repo.bulkimport.xml.AlfrescoReflectionUtils;
+import org.alfresco.repo.bulkimport.utils.AlfrescoFileImportUtils;
+import org.alfresco.repo.bulkimport.utils.AlfrescoReflectionUtils;
 import org.alfresco.repo.bulkimport.xml.AlfrescoXStreamMarshaller;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -19,14 +19,11 @@ import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
-import org.springframework.oxm.xstream.XStreamMarshaller;
-import org.springframework.util.ResourceUtils;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -43,6 +40,7 @@ public class ImportableFileTest {
   static Logger log = Logger.getLogger(ImportableFileTest.class);
   private static URL content1 = ClassLoader.getSystemClassLoader().getResource("content1.xml");
   private static URL folder1 = ClassLoader.getSystemClassLoader().getResource("folder1.xml");
+  //private static URL folder2 = ClassLoader.getSystemClassLoader().getResource("folder2.xml");
 
   protected static ApplicationContext applicationContext;
 
@@ -61,18 +59,13 @@ public class ImportableFileTest {
     applicationContext = ApplicationContextHelper.getApplicationContext(new String[]{"classpath:alfresco/application-context.xml"});
     marshaller = (AlfrescoXStreamMarshaller) applicationContext.getBean("configuredMarshaller");
     nodeService = (NodeService) applicationContext.getBean("NodeService");
-    streamingNodeImporterFactory = (StreamingNodeImporterFactory)applicationContext.getBean("streamingNodeImporterFactory");
-    bulkImporter = (MultiThreadedBulkFilesystemImporter)applicationContext.getBean("bulkFilesystemImporter");
-    repositoryHelper = (Repository)applicationContext.getBean("repositoryHelper");
-    fileFolderService = (FileFolderService)applicationContext.getBean("FileFolderService");
-    contentService = (ContentService)applicationContext.getBean("ContentService");
+    streamingNodeImporterFactory = (StreamingNodeImporterFactory) applicationContext.getBean("streamingNodeImporterFactory");
+    bulkImporter = (MultiThreadedBulkFilesystemImporter) applicationContext.getBean("bulkFilesystemImporter");
+    repositoryHelper = (Repository) applicationContext.getBean("repositoryHelper");
+    fileFolderService = (FileFolderService) applicationContext.getBean("FileFolderService");
+    contentService = (ContentService) applicationContext.getBean("ContentService");
 
     AuthenticationUtil.setFullyAuthenticatedUser(ADMIN_USER_NAME);
-  }
-
-  @Test
-  public void testWiring() {
-    assertNotNull(marshaller);
   }
 
   @Test
@@ -80,6 +73,7 @@ public class ImportableFileTest {
     Source source = new StreamSource(content1.openStream());
     Object unmarshalled = marshaller.unmarshal(source);
     assertEquals(Content.class, unmarshalled.getClass());
+    Content content = (Content) unmarshalled;
   }
 
   @Test
@@ -87,24 +81,31 @@ public class ImportableFileTest {
     Source source = new StreamSource(content1.openStream());
     Object unmarshalled = marshaller.unmarshal(source);
     Map<QName, Serializable> nodeProperties = AlfrescoReflectionUtils.getAlfrescoMeta(unmarshalled);
-    File metaFile = AlfrescoReflectionUtils.getMetaFile(nodeProperties,marshaller.getFileImportRootLocation());
+    File metaFile = AlfrescoFileImportUtils.getMetaFile(nodeProperties, marshaller.getFileImportRootLocation());
     assertTrue(metaFile.exists());
-    File binaryFile = AlfrescoReflectionUtils.getBinaryFile(nodeProperties,marshaller.getFileImportRootLocation());
+    File binaryFile = AlfrescoFileImportUtils.getBinaryFile(nodeProperties, marshaller.getFileImportRootLocation());
     assertTrue(binaryFile.exists());
   }
 
   @Test
   public void unmarshalFolder() throws IOException {
     Source source = new StreamSource(folder1.openStream());
-    Folder folder = (Folder)marshaller.unmarshal(source);
-    assertEquals(3,folder.getChildren().size());
+    Folder folder = (Folder) marshaller.unmarshal(source);
+    assertEquals(3, folder.getChildren().size());
   }
+
+//  @Test
+//  public void unmarshalFolder2() throws IOException {
+//    Source source = new StreamSource(folder2.openStream());
+//    Folder folder = (Folder) marshaller.unmarshal(source);
+//    assertEquals(3, folder.getChildren().size());
+//  }
 
   @Test
   public void runFileImport() throws IOException {
     NodeRef importedFolder = fileFolderService.create(
         repositoryHelper.getCompanyHome(),
-        "bulkImport-"+(new Date()).getTime(),
+        "bulkImport-" + (new Date()).getTime(),
         ContentModel.TYPE_FOLDER).getNodeRef();
 
     assertTrue(nodeService.exists(importedFolder));
@@ -119,8 +120,8 @@ public class ImportableFileTest {
 
     List<FileInfo> children = fileFolderService.list(importedFolder);
     assertNotNull(children);
-    for(FileInfo fileInfo : children) {
-      if(fileInfo.isFolder()) {
+    for (FileInfo fileInfo : children) {
+      if (fileInfo.isFolder()) {
         assertFolder(fileInfo);
       } else {
         assertContent(fileInfo);
@@ -135,11 +136,11 @@ public class ImportableFileTest {
   private void assertContent(NodeRef nodeRef) {
     assertEquals(ContentModel.TYPE_CONTENT, nodeService.getType(nodeRef));
     assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE));
-    assertTrue(nodeService.hasAspect(nodeRef,ContentModel.ASPECT_GEN_CLASSIFIABLE));
-    assertTrue(nodeService.hasAspect(nodeRef,ContentModel.ASPECT_AUDITABLE));
-    assertTrue(((String)nodeService.getProperty(nodeRef,ContentModel.PROP_NAME)).startsWith("contentname"));
-    assertTrue(((String)nodeService.getProperty(nodeRef,ContentModel.PROP_TITLE)).startsWith("Content Title"));
-    ContentReader reader = contentService.getReader(nodeRef,ContentModel.PROP_CONTENT);
+    assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_GEN_CLASSIFIABLE));
+    assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_AUDITABLE));
+    assertTrue(((String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME)).startsWith("contentname"));
+    assertTrue(((String) nodeService.getProperty(nodeRef, ContentModel.PROP_TITLE)).startsWith("Content Title"));
+    ContentReader reader = contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
     assertNotNull(reader);
     assertNotNull(reader.getContentInputStream());
   }
@@ -147,13 +148,13 @@ public class ImportableFileTest {
   private void assertFolder(FileInfo fileInfo) {
     NodeRef nodeRef = fileInfo.getNodeRef();
     assertEquals(ContentModel.TYPE_FOLDER, nodeService.getType(nodeRef));
-    assertTrue(nodeService.hasAspect(nodeRef,ContentModel.ASPECT_VERSIONABLE));
+    assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE));
     assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_GEN_CLASSIFIABLE));
     assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_AUDITABLE));
-    assertEquals("foldername",nodeService.getProperty(nodeRef,ContentModel.PROP_NAME));
-    assertEquals("Folder Title",nodeService.getProperty(nodeRef,ContentModel.PROP_TITLE));
+    assertEquals("foldername", nodeService.getProperty(nodeRef, ContentModel.PROP_NAME));
+    assertEquals("Folder Title", nodeService.getProperty(nodeRef, ContentModel.PROP_TITLE));
     List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef);
-    for(ChildAssociationRef child : children) {
+    for (ChildAssociationRef child : children) {
       assertContent(child.getChildRef());
     }
   }

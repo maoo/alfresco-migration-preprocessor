@@ -1,16 +1,16 @@
 package org.alfresco.repo.bulkimport.beans;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.alfresco.repo.bulkimport.annotations.NodeAspect;
-import org.alfresco.repo.bulkimport.annotations.NodeContentUrl;
-import org.alfresco.repo.bulkimport.annotations.NodeProperty;
-import org.alfresco.repo.bulkimport.annotations.NodeType;
+import org.alfresco.repo.bulkimport.annotations.*;
+
+import java.util.List;
 
 @XStreamAlias("content")
 @NodeType(
     name = "content",
     namespace = "http://www.alfresco.org/model/content/1.0",
     aspects = {
+        "{http://www.alfresco.org/model/content/1.0}referencing",
         "{http://www.alfresco.org/model/content/1.0}auditable",
         "{http://www.alfresco.org/model/content/1.0}generalclassifiable"})
 public final class Content {
@@ -30,6 +30,16 @@ public final class Content {
   @NodeAspect
   @XStreamAlias("isVersionable")
   private String versionable;
+
+//  @NodeAssociation(
+//      name = "references",
+//      namespace = "http://www.alfresco.org/bulkimport/model/content/1.0",
+//      fieldName = "referenceNames",
+//      fkPropertyName = "{http://www.alfresco.org/bulkimport/model/content/1.0}name",
+//      fkPropertyType = "{http://www.alfresco.org/bulkimport/model/content/1.0}content")
+//  private List<Content> references;
+//
+//  private String[] referenceNames;
 
   @Override
   public String toString() {
@@ -79,4 +89,20 @@ public final class Content {
   public void setContentUrl(String contentUrl) {
     this.contentUrl = contentUrl;
   }
+
+//  public List<Content> getReferences() {
+//    return references;
+//  }
+//
+//  public void setReferences(List<Content> references) {
+//    this.references = references;
+//  }
+//
+//  public String[] getReferenceNames() {
+//    return referenceNames;
+//  }
+//
+//  public void setReferenceNames(String[] referenceNames) {
+//    this.referenceNames = referenceNames;
+//  }
 }

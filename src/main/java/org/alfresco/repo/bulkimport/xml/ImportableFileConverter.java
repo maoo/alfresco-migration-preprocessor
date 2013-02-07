@@ -9,16 +9,21 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.bulkimport.annotations.NodeType;
+import org.alfresco.repo.bulkimport.utils.AlfrescoFileImportUtils;
+import org.alfresco.repo.bulkimport.utils.AlfrescoReflectionUtils;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.ContentService;
-import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.Triple;
 import org.apache.log4j.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -26,6 +31,7 @@ public class ImportableFileConverter implements Converter {
 
   static Logger log = Logger.getLogger(ImportableFileConverter.class);
   private static final Object CURRENT_FOLDER_CONTEXT_PARAM = "currentFolder";
+  private static final Object ASSOCS_CONTEXT_PARAM = "assocs";
 
   private File fileImportRootLocation;
   private Mapper mapper;
@@ -52,7 +58,7 @@ public class ImportableFileConverter implements Converter {
   @Override
   public Object unmarshal(HierarchicalStreamReader reader, final UnmarshallingContext context) {
 
-    File fileImportCurrentLocation = (File)context.get(CURRENT_FOLDER_CONTEXT_PARAM);
+    File fileImportCurrentLocation = (File) context.get(CURRENT_FOLDER_CONTEXT_PARAM);
     if (fileImportCurrentLocation == null) {
       fileImportCurrentLocation = this.fileImportRootLocation;
       log.debug(
@@ -68,11 +74,11 @@ public class ImportableFileConverter implements Converter {
     try {
       if (AlfrescoReflectionUtils.isContainer(currentClass)) {
         //Create the folder
-        String folderName = (new Date()).getTime()+"";
-        File folder = AlfrescoReflectionUtils.getFolder(folderName, fileImportCurrentLocation);
+        String folderName = (new Date()).getTime() + "";
+        File folder = AlfrescoFileImportUtils.getFolder(folderName, fileImportCurrentLocation);
 
         //Register the folder as current rootFolder where to import the other upcoming items
-        context.put(CURRENT_FOLDER_CONTEXT_PARAM,folder);
+        context.put(CURRENT_FOLDER_CONTEXT_PARAM, folder);
       }
       Converter javaBeanConverter = new JavaBeanConverter(this.mapper);
       currentObject = javaBeanConverter.unmarshal(reader, context);
@@ -88,25 +94,33 @@ public class ImportableFileConverter implements Converter {
 
       //Handling node aspects
       String aspects = "";
-      for(QName aspect : nodeAspects) {
+      for (QName aspect : nodeAspects) {
         aspects += aspect.toPrefixString(namespaceService) + ",";
       }
-      aspects = aspects.substring(0,aspects.length()-1);
-      properties.put(AlfrescoReflectionUtils.PROPERTY_NAME_ASPECTS,aspects);
+      aspects = aspects.substring(0, aspects.length() - 1);
+      properties.put(AlfrescoReflectionUtils.PROPERTY_NAME_ASPECTS, aspects);
 
       //Handling node properties
-      for(QName propertyName : nodeProperties.keySet()) {
+      for (QName propertyName : nodeProperties.keySet()) {
         properties.put(propertyName.toPrefixString(namespaceService), nodeProperties.get(propertyName));
       }
 
+//      Handling associations
+//      List<Triple<QName,QName,String>> assocs = AlfrescoReflectionUtils.getAlfrescoAssocs(currentObject);
+//      List<Triple<QName,QName,String>> currentAssocs = (List<Triple<QName,QName,String>>)context.get(ASSOCS_CONTEXT_PARAM);
+//      if (currentAssocs != null) {
+//        currentAssocs.addAll(assocs);
+//      }
+//      context.put(ASSOCS_CONTEXT_PARAM,currentAssocs);
+
       if (AlfrescoReflectionUtils.isContainer(currentClass)) {
         String name = (String) nodeProperties.get(ContentModel.PROP_NAME);
-        File currentFolder = (File)context.get(CURRENT_FOLDER_CONTEXT_PARAM);
+        File currentFolder = (File) context.get(CURRENT_FOLDER_CONTEXT_PARAM);
         File parent = currentFolder.getParentFile();
 
         //Rename the folder and update the currentRootFolder with the parent
-        currentFolder.renameTo(new File(parent,name));
-        context.put(CURRENT_FOLDER_CONTEXT_PARAM,parent);
+        currentFolder.renameTo(new File(parent, name));
+        context.put(CURRENT_FOLDER_CONTEXT_PARAM, parent);
         log.debug(
             "[ImportableFileConverter] folder " +
                 currentFolder +
@@ -114,12 +128,12 @@ public class ImportableFileConverter implements Converter {
       } else {
         String contentUrl = AlfrescoReflectionUtils.getContentUrl(currentObject);
         log.debug("[ImportableFileConverter] importing content from url " + contentUrl);
-        File metaFile = AlfrescoReflectionUtils.getBinaryFile(nodeProperties, fileImportCurrentLocation);
-        AlfrescoFileImportUtils.fetchBinaryContent(metaFile,contentUrl);
+        File metaFile = AlfrescoFileImportUtils.getBinaryFile(nodeProperties, fileImportCurrentLocation);
+        AlfrescoFileImportUtils.fetchBinaryContent(metaFile, contentUrl);
       }
 
       //Handling meta File creation
-      File metaFile = AlfrescoReflectionUtils.getMetaFile(nodeProperties, fileImportCurrentLocation);
+      File metaFile = AlfrescoFileImportUtils.getMetaFile(nodeProperties, fileImportCurrentLocation);
 
       log.debug(
           "[ImportableFileConverter.unmarshal] current class: " + currentClass +
@@ -150,6 +164,6 @@ public class ImportableFileConverter implements Converter {
   }
 
   private void handleException(Object currentObject, Throwable e) {
-    throw new IllegalStateException("Error convering object "+currentObject,e);
+    throw new IllegalStateException("Error convering object " + currentObject, e);
   }
 }

@@ -2,15 +2,11 @@ package org.alfresco.repo.bulkimport.xml;
 
 import com.thoughtworks.xstream.converters.ConverterMatcher;
 import com.thoughtworks.xstream.mapper.Mapper;
-import org.alfresco.repo.bulkimport.annotations.NodeType;
 import org.alfresco.service.ServiceRegistry;
 import org.apache.log4j.Logger;
-import org.reflections.Configuration;
-import org.reflections.Reflections;
 import org.springframework.oxm.xstream.XStreamMarshaller;
 
 import java.io.File;
-import java.util.Set;
 
 public class AlfrescoXStreamMarshaller extends XStreamMarshaller {
 
