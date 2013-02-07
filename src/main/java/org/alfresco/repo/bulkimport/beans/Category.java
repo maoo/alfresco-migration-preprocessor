@@ -15,8 +15,8 @@ public final class Category {
 
   @Override
   public String toString() {
-    return "Printing Class: " + this.getClass() + "\n" +
-        "* Name: " + this.name + "\n";
+    return this.getClass().getName() + "(" +
+        this.name + ")";
   }
 
   public String getName() {

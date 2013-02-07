@@ -22,19 +22,15 @@ public class AlfrescoXStreamMarshaller extends XStreamMarshaller {
 
   private File fileImportRootLocation;
   private List<Triple<NodeAssociation,Object,Object>> assocsStack;
+  private Mapper mapper;
+  private ServiceRegistry serviceRegistry;
 
   public AlfrescoXStreamMarshaller(String rootLocation, ServiceRegistry serviceRegistry) {
     super();
-    Mapper mapper = this.getXStream().getMapper();
+    this.serviceRegistry =serviceRegistry;
+    this.mapper = this.getXStream().getMapper();
     this.fileImportRootLocation = new File(rootLocation);
-    this.assocsStack = new ArrayList<Triple<NodeAssociation,Object,Object>>();
-    if (!this.fileImportRootLocation.exists()) {
-      this.fileImportRootLocation.mkdir();
-    }
-    ConverterMatcher importableFileConverter = new ImportableFileConverter(this.fileImportRootLocation, mapper, serviceRegistry,assocsStack);
-    ConverterMatcher[] converters = new ConverterMatcher[]{importableFileConverter};
-    setConverters(converters);
-
+    clearContents();
 //    Reflections reflections = new Reflections();
 //    Set<Class<?>> annotated =
 //        reflections.getTypesAnnotatedWith(NodeType.class);
@@ -45,6 +41,20 @@ public class AlfrescoXStreamMarshaller extends XStreamMarshaller {
 //    setAnnotatedClasses(annotated.toArray(new Class[]{}));
   }
 
+  public void clearContents() {
+    if (!this.fileImportRootLocation.exists()) {
+      this.fileImportRootLocation.mkdir();
+    }
+    this.assocsStack = new ArrayList<Triple<NodeAssociation,Object,Object>>();
+    setAlfrescoConverter();
+  }
+
+  private void setAlfrescoConverter() {
+    ConverterMatcher importableFileConverter = new ImportableFileConverter(this.fileImportRootLocation, mapper, serviceRegistry,assocsStack);
+    ConverterMatcher[] converters = new ConverterMatcher[]{importableFileConverter};
+    setConverters(converters);
+  }
+
   public File getFileImportRootLocation() {
     return this.fileImportRootLocation;
   }
@@ -52,5 +62,4 @@ public class AlfrescoXStreamMarshaller extends XStreamMarshaller {
   public List<Triple<NodeAssociation,Object,Object>> getAssocsStack() {
     return this.assocsStack;
   }
-
 }

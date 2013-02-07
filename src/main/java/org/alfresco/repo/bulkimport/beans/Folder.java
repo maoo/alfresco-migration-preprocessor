@@ -35,11 +35,11 @@ public final class Folder {
 
   @Override
   public String toString() {
-    return "Printing Class: " + this.getClass() + "\n" +
-        "* Name: " + this.name + "\n" +
-        "* Title: " + this.title + "\n" +
-        "* Description: " + this.description + "\n" +
-        "* is versionable: " + this.versionable + "\n";
+    return this.getClass().getName() + "(" +
+        this.name + "," +
+        this.title + "," +
+        this.description + "," +
+        this.versionable + ")";
   }
 
   public String getName() {

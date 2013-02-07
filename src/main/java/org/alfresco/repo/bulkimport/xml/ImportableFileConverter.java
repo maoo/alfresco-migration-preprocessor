@@ -45,9 +45,7 @@ public class ImportableFileConverter implements Converter {
 
   @Override
   public boolean canConvert(Class aClass) {
-    boolean ret = aClass.getAnnotation(NodeType.class) != null;
-    log.debug("[ImportableFileConverter] canConvert " + aClass + "? " + ret);
-    return ret;
+    return aClass.getAnnotation(NodeType.class) != null;
   }
 
   @Override
@@ -62,10 +60,10 @@ public class ImportableFileConverter implements Converter {
     if (fileImportCurrentLocation == null) {
       fileImportCurrentLocation = this.fileImportRootLocation;
       log.debug(
-          "[ImportableFileConverter.unmarshal] null root folder from context; setting root folder to " + fileImportCurrentLocation.getAbsolutePath());
+          "[unmarshal] null root folder from context; setting root folder to " + fileImportCurrentLocation.getAbsolutePath());
     } else {
       log.debug(
-          "[ImportableFileConverter.unmarshal] root folder from context " + fileImportCurrentLocation.getAbsolutePath());
+          "[unmarshal] root folder from context " + fileImportCurrentLocation.getAbsolutePath());
     }
 
     FileOutputStream fos = null;
@@ -120,14 +118,9 @@ public class ImportableFileConverter implements Converter {
 
         //Register the current parent's folder as current rootFolder where to import next node entities
         context.put(CURRENT_FOLDER_CONTEXT_PARAM, parent);
-        log.debug(
-            "[ImportableFileConverter] folder " +
-                currentFolder +
-                "completed; adding parent as new root");
       } else {
         String contentUrl = AlfrescoReflectionUtils.getContentUrl(currentObject);
         if (contentUrl != null) {
-          log.debug("[ImportableFileConverter] importing content from url " + contentUrl);
           File metaFile = AlfrescoFileImportUtils.getBinaryFile(nodeProperties, fileImportCurrentLocation);
           AlfrescoFileImportUtils.fetchBinaryContent(metaFile, contentUrl);
         }
@@ -139,7 +132,7 @@ public class ImportableFileConverter implements Converter {
       properties.storeToXML(fos, null);
 
       log.debug(
-          "[ImportableFileConverter.unmarshal] current class: " + currentClass +
+          "[unmarshal] current class: " + currentClass +
               "current object: " + currentObject +
               "alfresco properties: " + nodeProperties +
               "meta File: " + metaFile.getAbsolutePath());

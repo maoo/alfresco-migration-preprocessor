@@ -9,6 +9,7 @@
       <title>Content Title 4</title>
       <description>the most awesome content ever 4</description>
       <isVersionable>true</isVersionable>
+      <contentUrl>http://www.bioinformatics.org/strap/gallery/exampleOutput.doc</contentUrl>
       <referenceNames>
         <string>contentname1</string>
         <string>contentname2</string>
@@ -19,6 +20,7 @@
       <title>Content Title 5</title>
       <description>the most awesome content ever 5</description>
       <isVersionable>true</isVersionable>
+      <contentUrl>http://www.ieee.org/documents/MSW_A4_format.doc</contentUrl>
       <referenceNames>
         <string>contentname2</string>
         <string>contentname3</string>
@@ -27,8 +29,9 @@
     <content>
       <name>contentname6</name>
       <title>Content Title 6</title>
-      <description>the most awesome content ever 5</description>
+      <description>the most awesome content ever 6</description>
       <isVersionable>true</isVersionable>
+      <contentUrl>http://www.ieee.org/documents/TRANS-JOUR.doc</contentUrl>
       <referenceNames>
         <string>contentname1</string>
         <string>contentname3</string>

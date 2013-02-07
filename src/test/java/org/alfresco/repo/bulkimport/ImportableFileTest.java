@@ -73,6 +73,7 @@ public class ImportableFileTest {
 
   @Test
   public void fileExists() throws IOException, InvocationTargetException, IllegalAccessException {
+    marshaller = (AlfrescoXStreamMarshaller) applicationContext.getBean("alfrescoMarshaller");
     Source source = new StreamSource(content1.openStream());
     Object unmarshalled = marshaller.unmarshal(source);
     assertEquals(Content.class, unmarshalled.getClass());
@@ -83,21 +84,23 @@ public class ImportableFileTest {
     assertTrue(binaryFile.exists());
     log.info("Renaming "+marshaller.getFileImportRootLocation().getAbsolutePath());
     marshaller.getFileImportRootLocation().renameTo(new File(marshaller.getFileImportRootLocation().getParent(),new Date().getTime()+""));
-    marshaller.getFileImportRootLocation().mkdir();
+    marshaller.clearContents();
   }
 
   @Test
   public void unmarshalFolder() throws IOException {
+    marshaller = (AlfrescoXStreamMarshaller) applicationContext.getBean("alfrescoMarshaller");
     Source source = new StreamSource(folder1.openStream());
     Folder folder = (Folder) marshaller.unmarshal(source);
     assertEquals(3, folder.getChildren().size());
     log.info("Renaming "+marshaller.getFileImportRootLocation().getAbsolutePath());
     marshaller.getFileImportRootLocation().renameTo(new File(marshaller.getFileImportRootLocation().getParent(),new Date().getTime()+""));
-    marshaller.getFileImportRootLocation().mkdir();
+    marshaller.clearContents();
   }
 
   @Test
   public void unmarshalFolder2() throws IOException {
+    marshaller = (AlfrescoXStreamMarshaller) applicationContext.getBean("alfrescoMarshaller");
     Source source = new StreamSource(folder2.openStream());
     Folder folder = (Folder) marshaller.unmarshal(source);
     assertEquals(3, folder.getChildren().size());
@@ -111,11 +114,13 @@ public class ImportableFileTest {
     assertEquals(6,assocs.size());
     log.info("Renaming "+marshaller.getFileImportRootLocation().getAbsolutePath());
     marshaller.getFileImportRootLocation().renameTo(new File(marshaller.getFileImportRootLocation().getParent(),new Date().getTime()+""));
-    marshaller.getFileImportRootLocation().mkdir();
+    marshaller.clearContents();
   }
 
+
   @Test
-  public void runFileImport() throws IOException {
+  public void runFileImport() throws IOException, InvocationTargetException, IllegalAccessException {
+    marshaller = (AlfrescoXStreamMarshaller) applicationContext.getBean("alfrescoMarshaller");
     NodeRef importedFolder = fileFolderService.create(
         repositoryHelper.getCompanyHome(),
         "bulkImport-" + (new Date()).getTime(),
@@ -141,6 +146,7 @@ public class ImportableFileTest {
         assertContent(fileInfo.getNodeRef());
       }
     }
+    marshaller.clearContents();
   }
 
   private void assertContent(NodeRef nodeRef) {

@@ -33,21 +33,21 @@ public final class Content {
 
   @NodeAssociation(
       name = "references",
-      namespace = "http://www.alfresco.org/bulkimport/model/content/1.0",
+      namespace = "http://www.alfresco.org/model/content/1.0",
       fieldName = "referenceNames",
-      fkPropertyName = "{http://www.alfresco.org/bulkimport/model/content/1.0}name",
-      fkPropertyType = "{http://www.alfresco.org/bulkimport/model/content/1.0}content")
+      fkPropertyName = "{http://www.alfresco.org/model/content/1.0}name",
+      fkPropertyType = "{http://www.alfresco.org/model/content/1.0}content")
   private List<Content> references;
 
   private String[] referenceNames;
 
   @Override
   public String toString() {
-    return "Printing Class: " + this.getClass() + "\n" +
-        "* Name: " + this.name + "\n" +
-        "* Title: " + this.title + "\n" +
-        "* Description: " + this.description + "\n" +
-        "* is versionable: " + this.versionable + "\n";
+    return this.getClass().getName() + "(" +
+        this.name + "," +
+        this.title + "," +
+        this.description + "," +
+        this.versionable + ")";
   }
 
   public String getName() {

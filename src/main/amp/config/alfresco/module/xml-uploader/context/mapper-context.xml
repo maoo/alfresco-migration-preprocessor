@@ -22,6 +22,7 @@
         class="org.alfresco.repo.bulkimport.xml.XmlBulkImporter">
     <constructor-arg ref="streamingNodeImporterFactory"/>
     <constructor-arg ref="alfrescoMarshaller"/>
+    <constructor-arg ref="ServiceRegistry"/>
     <property name="bulkImporter" ref="bulkFilesystemImporter"/>
     <property name="repositoryHelper" ref="repositoryHelper"/>
   </bean>

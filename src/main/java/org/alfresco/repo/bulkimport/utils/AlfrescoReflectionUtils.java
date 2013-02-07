@@ -37,19 +37,11 @@ public class AlfrescoReflectionUtils {
           String propertyName = (!StringUtil.isEmpty(nodePropertyName)) ? nodePropertyName : fieldName;
           Serializable propertyValue = (Serializable) field.get(obj);
           QName nsQname = QName.createQName(namespace, propertyName);
-
-          log.debug("[Parsing Alfresco Meta] " +
-              "Class " + obj.getClass() +
-              " , TypeNamespace " + typeNamespace +
-              " , Field name " + fieldName +
-              " , NodePropName " + nodePropertyName +
-              " , NodePropNamespace " + nodePropertyNamespace);
-
           ret.put(nsQname, propertyValue);
-          log.debug("[Added Alfresco Meta] Namespace " + namespace + " , propertyName" + propertyName + " , value" + propertyValue);
         }
       }
     }
+    log.debug("[Adding Alfresco Metas] " + ret);
     return ret;
   }
 
@@ -95,26 +87,17 @@ public class AlfrescoReflectionUtils {
         String aspectName = (!StringUtil.isEmpty(nodeAspectName)) ? nodeAspectName : fieldName;
         Serializable fieldValue = (Serializable) field.get(obj);
 
-        log.debug("[Parsing Alfresco Aspects] " +
-            "Class " + obj.getClass() +
-            " , TypeNamespace " + typeNamespace +
-            " , Field name " + fieldName +
-            " , NodePropName " + nodeAspectName +
-            " , NodePropNamespace " + nodeAspectNamespace);
-
         if (fieldValue != null) {
           aspects.add(QName.createQName(namespace, aspectName));
-          log.debug("[Added Alfresco Aspect] Namespace " + namespace + " , aspectName" + aspectName);
         }
       }
     }
+    log.debug("[Added Alfresco Aspects] " + aspects.toArray());
     return aspects.toArray(new QName[]{});
   }
 
   public static boolean isContainer(Class currentClass) {
-    boolean ret = currentClass.getAnnotation(NodeParent.class) != null;
-    log.debug("[AlfrescoReflectionUtils] isContainer " + currentClass + "? " + ret);
-    return ret;
+    return currentClass.getAnnotation(NodeParent.class) != null;
   }
 
   public static String getContentUrl(Object currentObject) throws IllegalAccessException {
@@ -141,7 +124,6 @@ public class AlfrescoReflectionUtils {
         }
         associationValuesField.setAccessible(true);
         Object fieldValue = associationValuesField.get(currentObject);
-        log.debug("[getAlfrescoAssocs] current fieldValue: "+fieldValue);
         if (fieldValue != null) {
           Collection fieldValueList = new ArrayList();
           if (fieldValue instanceof String[]) {
