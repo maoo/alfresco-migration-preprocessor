@@ -106,7 +106,7 @@ public class ImportableFileConverter implements Converter {
 
       //Handling node properties
       for (QName propertyName : nodeProperties.keySet()) {
-        String nodeName = (String) nodeProperties.get(propertyName);
+        Object nodeName = nodeProperties.get(propertyName);
         if (nodeName != null) {
           properties.put(propertyName.toPrefixString(namespaceService), nodeName);
         }
