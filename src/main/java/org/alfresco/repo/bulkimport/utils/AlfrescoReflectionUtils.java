@@ -5,6 +5,7 @@ import org.alfresco.repo.bulkimport.annotations.*;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.Triple;
 import org.apache.log4j.Logger;
+import org.springframework.util.ReflectionUtils;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -20,11 +21,14 @@ public class AlfrescoReflectionUtils {
   public static final java.lang.String METADATA_FILE_EXTENSION = "properties.xml";
 
   public static Map<QName, Serializable> getAlfrescoMeta(Object obj) throws InvocationTargetException, IllegalAccessException {
+
+    final List<Field> fields = getAllFields(obj);
+
     Map<QName, Serializable> ret = new HashMap<QName, Serializable>();
     if (obj.getClass().isAnnotationPresent(NodeType.class)) {
       QName nodeType = getNodeType(obj);
       String typeNamespace = nodeType.getNamespaceURI();
-      for (Field field : obj.getClass().getDeclaredFields()) {
+      for (Field field : fields) {
         field.setAccessible(true);
         String fieldName = field.getName();
         NodeProperty nodeProperty = field.getAnnotation(NodeProperty.class);
@@ -42,6 +46,17 @@ public class AlfrescoReflectionUtils {
     }
     log.debug("[Adding Alfresco Metas] " + ret);
     return ret;
+  }
+
+  private static List<Field> getAllFields(Object obj) {
+    final List<Field> fields = new ArrayList<Field>();
+    ReflectionUtils.doWithFields(obj.getClass(), new ReflectionUtils.FieldCallback() {
+      @Override
+      public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
+        fields.add(field);
+      }
+    });
+    return fields;
   }
 
   public static QName getNodeType(Object obj) throws InvocationTargetException, IllegalAccessException {
@@ -74,7 +89,7 @@ public class AlfrescoReflectionUtils {
     List<QName> aspects = getNodeTypeAspects(obj);
     String typeNamespace = nodeType.getNamespaceURI();
 
-    for (Field field : obj.getClass().getDeclaredFields()) {
+    for (Field field : getAllFields(obj)) {
       field.setAccessible(true);
       String fieldName = field.getName();
       NodeAspect nodeAspect = field.getAnnotation(NodeAspect.class);
@@ -100,7 +115,7 @@ public class AlfrescoReflectionUtils {
   }
 
   public static String getContentUrl(Object currentObject) throws IllegalAccessException {
-    for (Field field : currentObject.getClass().getDeclaredFields()) {
+    for (Field field : getAllFields(currentObject)) {
       field.setAccessible(true);
       NodeContentUrl contentUrlAnnotation = field.getAnnotation(NodeContentUrl.class);
       if (contentUrlAnnotation != null) {
@@ -112,11 +127,11 @@ public class AlfrescoReflectionUtils {
 
   public static List<Triple<NodeAssociation, Object, Object>> getAlfrescoAssocs(Object currentObject) throws NoSuchFieldException, IllegalAccessException {
     List<Triple<NodeAssociation, Object, Object>> ret = new ArrayList<Triple<NodeAssociation, Object, Object>>();
-    for (Field field : currentObject.getClass().getDeclaredFields()) {
+    for (Field field : getAllFields(currentObject)) {
       NodeAssociation nodeAssociation = field.getAnnotation(NodeAssociation.class);
       if (nodeAssociation != null) {
         String associationValuesFieldName = nodeAssociation.fieldName();
-        Field associationValuesField = currentObject.getClass().getDeclaredField(associationValuesFieldName);
+        Field associationValuesField = getField(currentObject,associationValuesFieldName);
         if (associationValuesField == null) {
           IllegalStateException e = new IllegalStateException("Field " + associationValuesFieldName + " is null on object " + currentObject);
           AlfrescoFileImportUtils.handleException(currentObject, e);
@@ -140,6 +155,16 @@ public class AlfrescoReflectionUtils {
       }
     }
     return ret;
+  }
+
+  private static Field getField(Object object, String fieldName) {
+    List<Field> allFields = getAllFields(object);
+    for(Field field : allFields) {
+      if (fieldName.equals(field.getName())) {
+        return field;
+      }
+    }
+    return null;
   }
 
 //  public static <T> Object getBean(NodeService nodeService, NodeRef nodeRef, Class<T> clazz) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchMethodException {

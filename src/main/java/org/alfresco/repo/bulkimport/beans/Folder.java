@@ -16,20 +16,7 @@ import java.util.List;
     aspects = {
         "{http://www.alfresco.org/model/content/1.0}auditable",
         "{http://www.alfresco.org/model/content/1.0}generalclassifiable"})
-public final class Folder {
-
-  @NodeProperty
-  private String name;
-
-  @NodeProperty
-  private String title;
-
-  @NodeProperty
-  private String description;
-
-  @NodeAspect
-  @XStreamAlias("isVersionable")
-  private String versionable;
+public final class Folder extends CmObject {
 
   private List<Content> children;
 
@@ -40,38 +27,6 @@ public final class Folder {
         this.title + "," +
         this.description + "," +
         this.versionable + ")";
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public String getVersionable() {
-    return versionable;
-  }
-
-  public void setVersionable(String versionable) {
-    this.versionable = versionable;
   }
 
   public List<Content> getChildren() {

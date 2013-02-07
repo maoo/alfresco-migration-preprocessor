@@ -13,26 +13,10 @@ import java.util.List;
         "{http://www.alfresco.org/model/content/1.0}referencing",
         "{http://www.alfresco.org/model/content/1.0}auditable",
         "{http://www.alfresco.org/model/content/1.0}generalclassifiable"})
-public final class Content {
-
-  @NodeProperty
-  private String name;
-
-  @NodeProperty
-  private Long id;
-
-  @NodeProperty
-  private String title;
-
-  @NodeProperty
-  private String description;
+public class Content extends CmObject {
 
   @NodeContentUrl
   private String contentUrl;
-
-  @NodeAspect
-  @XStreamAlias("isVersionable")
-  private String versionable;
 
   @NodeAssociation(
       name = "references",
@@ -47,42 +31,10 @@ public final class Content {
   @Override
   public String toString() {
     return this.getClass().getName() + "(" +
-        this.name + "," +
+        super.name + "," +
         this.title + "," +
         this.description + "," +
         this.versionable + ")";
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public String getVersionable() {
-    return versionable;
-  }
-
-  public void setVersionable(String versionable) {
-    this.versionable = versionable;
   }
 
   public String getContentUrl() {
@@ -107,13 +59,5 @@ public final class Content {
 
   public void setReferenceNames(String[] referenceNames) {
     this.referenceNames = referenceNames;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
   }
 }
