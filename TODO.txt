@@ -17,13 +17,15 @@
 + Custom (XStream) converters
 + Custom listeners
 
-5. Add multi-threading capabilities
+5. Use Alfresco internal BatchProcessor to process peer associations
 
-6. Simplify usage by using Spring, alfresco-global.properties and JMX
+6. Add multi-threading capabilities
 
-7. Documentation (small blogpost on how to use it on API level)
+7. Simplify usage by using Spring, alfresco-global.properties and JMX
 
-8. Alfresco Share Console page, which allows to
+8. Documentation (small blogpost on how to use it on API level)
+
+9. Alfresco Share Console page, which allows to
 + start/monitor XML uploading
 + see beans, converters and listeners being registered
 (preferably same of JMX)
