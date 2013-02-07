@@ -1,6 +1,5 @@
 package org.alfresco.repo.bulkimport.xml;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.repo.bulkimport.BulkFilesystemImporter;
 import org.alfresco.repo.bulkimport.BulkImportParameters;
 import org.alfresco.repo.bulkimport.NodeImporter;
@@ -56,7 +55,7 @@ public class XmlBulkImporter {
 
   public List bulkImport(NodeRef targetFolder, List<Source> sources) throws IOException, InvocationTargetException, IllegalAccessException {
     List ret = new ArrayList();
-    for(Source source : sources) {
+    for (Source source : sources) {
       ret.add(marshaller.unmarshal(source));
     }
     bulkImportParameters.setTarget(targetFolder);
@@ -66,16 +65,16 @@ public class XmlBulkImporter {
     for (Triple<NodeAssociation, Object, Object> assocTriple : assocs) {
       String assocName = assocTriple.getFirst().name();
       String assocNamespace = assocTriple.getFirst().namespace();
-      QName assoc = QName.createQName(assocNamespace,assocName);
+      QName assoc = QName.createQName(assocNamespace, assocName);
       QName fkPropertyType = QName.createQName(assocTriple.getFirst().fkPropertyType());
       QName fkPropertyName = QName.createQName(assocTriple.getFirst().fkPropertyName());
       NodeRef associating = findNodeRef(assocTriple.getSecond());
 
       Map<QName, Serializable> meta = new HashMap<QName, Serializable>();
-      meta.put(QName.createQName(AlfrescoReflectionUtils.PROPERTY_NAME_TYPE),fkPropertyType.toPrefixString(namespaceService));
-      meta.put(fkPropertyName,(String)assocTriple.getThird());
+      meta.put(QName.createQName(AlfrescoReflectionUtils.PROPERTY_NAME_TYPE), fkPropertyType.toPrefixString(namespaceService));
+      meta.put(fkPropertyName, (String) assocTriple.getThird());
       NodeRef associated = findNodeRef(meta);
-      this.nodeService.createAssociation(associating,associated,assoc);
+      this.nodeService.createAssociation(associating, associated, assoc);
     }
 
     return ret;
@@ -84,35 +83,36 @@ public class XmlBulkImporter {
   private NodeRef findNodeRef(Object object) throws InvocationTargetException, IllegalAccessException {
     return findNodeRef(AlfrescoReflectionUtils.getAlfrescoMeta(object));
   }
+
   private NodeRef findNodeRef(Map<QName, Serializable> meta) throws InvocationTargetException, IllegalAccessException {
     String ftsQuery = "";
-    for(QName propName : meta.keySet()) {
+    for (QName propName : meta.keySet()) {
       if (propName.getLocalName().equals(AlfrescoReflectionUtils.PROPERTY_NAME_TYPE)) {
-        ftsQuery += "TYPE:\"" + meta.get(propName) +"\" AND ";
+        ftsQuery += "TYPE:\"" + meta.get(propName) + "\" AND ";
       } else if (propName.getLocalName().equals(AlfrescoReflectionUtils.PROPERTY_NAME_ASPECTS)) {
-        String aspects = (String)meta.get(propName);
-        StringTokenizer st = new StringTokenizer(aspects,",");
-        while(st.hasMoreTokens()) {
-          ftsQuery += "ASPECT:\"" + st.nextToken() +"\" AND ";
+        String aspects = (String) meta.get(propName);
+        StringTokenizer st = new StringTokenizer(aspects, ",");
+        while (st.hasMoreTokens()) {
+          ftsQuery += "ASPECT:\"" + st.nextToken() + "\" AND ";
         }
       } else {
-        String propValue = (String)meta.get(propName);
-        ftsQuery += "@" + propName.toPrefixString(this.namespaceService) + ":\"" + propValue +"\" AND ";
+        String propValue = (String) meta.get(propName);
+        ftsQuery += "@" + propName.toPrefixString(this.namespaceService) + ":\"" + propValue + "\" AND ";
       }
     }
-    ftsQuery = ftsQuery.substring(0,ftsQuery.length()-5);
+    ftsQuery = ftsQuery.substring(0, ftsQuery.length() - 5);
 
     //ftsQuery = "@cm:name:contentname4";
 
-    log.debug("Executing FTS query '"+ ftsQuery + "'");
+    log.debug("Executing FTS query '" + ftsQuery + "'");
     ResultSet resultSet = this.searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, SearchService.LANGUAGE_FTS_ALFRESCO, ftsQuery);
     if (resultSet.length() == 0 || resultSet.length() > 1) {
       AlfrescoFileImportUtils.handleException(meta,
           new IllegalStateException(
-              "Following query returned "+
-              resultSet.length()+
-              " while expecting one\n"+
-              ftsQuery));
+              "Following query returned " +
+                  resultSet.length() +
+                  " while expecting one\n" +
+                  ftsQuery));
     }
     return resultSet.iterator().next().getNodeRef();
 

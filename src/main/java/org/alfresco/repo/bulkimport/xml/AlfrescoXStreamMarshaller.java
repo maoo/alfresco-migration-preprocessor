@@ -4,30 +4,26 @@ import com.thoughtworks.xstream.converters.ConverterMatcher;
 import com.thoughtworks.xstream.mapper.Mapper;
 import org.alfresco.repo.bulkimport.annotations.NodeAssociation;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.namespace.QName;
-import org.alfresco.util.Pair;
 import org.alfresco.util.Triple;
 import org.apache.log4j.Logger;
 import org.springframework.oxm.xstream.XStreamMarshaller;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AlfrescoXStreamMarshaller extends XStreamMarshaller {
 
   static Logger log = Logger.getLogger(AlfrescoXStreamMarshaller.class);
 
   private File fileImportRootLocation;
-  private List<Triple<NodeAssociation,Object,Object>> assocsStack;
+  private List<Triple<NodeAssociation, Object, Object>> assocsStack;
   private Mapper mapper;
   private ServiceRegistry serviceRegistry;
 
   public AlfrescoXStreamMarshaller(String rootLocation, ServiceRegistry serviceRegistry) {
     super();
-    this.serviceRegistry =serviceRegistry;
+    this.serviceRegistry = serviceRegistry;
     this.mapper = this.getXStream().getMapper();
     this.fileImportRootLocation = new File(rootLocation);
     clearContents();
@@ -45,12 +41,12 @@ public class AlfrescoXStreamMarshaller extends XStreamMarshaller {
     if (!this.fileImportRootLocation.exists()) {
       this.fileImportRootLocation.mkdir();
     }
-    this.assocsStack = new ArrayList<Triple<NodeAssociation,Object,Object>>();
+    this.assocsStack = new ArrayList<Triple<NodeAssociation, Object, Object>>();
     setAlfrescoConverter();
   }
 
   private void setAlfrescoConverter() {
-    ConverterMatcher importableFileConverter = new ImportableFileConverter(this.fileImportRootLocation, mapper, serviceRegistry,assocsStack);
+    ConverterMatcher importableFileConverter = new ImportableFileConverter(this.fileImportRootLocation, mapper, serviceRegistry, assocsStack);
     ConverterMatcher[] converters = new ConverterMatcher[]{importableFileConverter};
     setConverters(converters);
   }
@@ -59,7 +55,7 @@ public class AlfrescoXStreamMarshaller extends XStreamMarshaller {
     return this.fileImportRootLocation;
   }
 
-  public List<Triple<NodeAssociation,Object,Object>> getAssocsStack() {
+  public List<Triple<NodeAssociation, Object, Object>> getAssocsStack() {
     return this.assocsStack;
   }
 }

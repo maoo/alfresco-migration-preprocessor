@@ -3,7 +3,6 @@ package org.alfresco.repo.bulkimport.utils;
 import com.google.gdata.util.common.base.StringUtil;
 import org.alfresco.repo.bulkimport.annotations.*;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.Pair;
 import org.alfresco.util.Triple;
 import org.apache.log4j.Logger;
 
@@ -111,15 +110,15 @@ public class AlfrescoReflectionUtils {
     return null;
   }
 
-  public static List<Triple<NodeAssociation, Object,Object>> getAlfrescoAssocs(Object currentObject) throws NoSuchFieldException, IllegalAccessException {
-    List<Triple<NodeAssociation, Object,Object>> ret = new ArrayList<Triple<NodeAssociation, Object,Object>>();
+  public static List<Triple<NodeAssociation, Object, Object>> getAlfrescoAssocs(Object currentObject) throws NoSuchFieldException, IllegalAccessException {
+    List<Triple<NodeAssociation, Object, Object>> ret = new ArrayList<Triple<NodeAssociation, Object, Object>>();
     for (Field field : currentObject.getClass().getDeclaredFields()) {
       NodeAssociation nodeAssociation = field.getAnnotation(NodeAssociation.class);
       if (nodeAssociation != null) {
         String associationValuesFieldName = nodeAssociation.fieldName();
         Field associationValuesField = currentObject.getClass().getDeclaredField(associationValuesFieldName);
         if (associationValuesField == null) {
-          IllegalStateException e = new IllegalStateException("Field "+associationValuesFieldName+" is null on object "+currentObject);
+          IllegalStateException e = new IllegalStateException("Field " + associationValuesFieldName + " is null on object " + currentObject);
           AlfrescoFileImportUtils.handleException(currentObject, e);
         }
         associationValuesField.setAccessible(true);
@@ -127,15 +126,15 @@ public class AlfrescoReflectionUtils {
         if (fieldValue != null) {
           Collection fieldValueList = new ArrayList();
           if (fieldValue instanceof String[]) {
-            fieldValueList = Arrays.asList((String[])fieldValue);
+            fieldValueList = Arrays.asList((String[]) fieldValue);
           } else if (fieldValue instanceof Collection) {
-            fieldValueList = (Collection)fieldValue;
+            fieldValueList = (Collection) fieldValue;
           } else {
-            IllegalStateException e = new IllegalStateException("Peer associations only support String[] and Collection Java objects; cannot parse "+fieldValue);
+            IllegalStateException e = new IllegalStateException("Peer associations only support String[] and Collection Java objects; cannot parse " + fieldValue);
             AlfrescoFileImportUtils.handleException(currentObject, e);
           }
-          for(Object associatedObject : fieldValueList) {
-            ret.add(new Triple<NodeAssociation, Object,Object>(nodeAssociation, currentObject,associatedObject));
+          for (Object associatedObject : fieldValueList) {
+            ret.add(new Triple<NodeAssociation, Object, Object>(nodeAssociation, currentObject, associatedObject));
           }
         }
       }

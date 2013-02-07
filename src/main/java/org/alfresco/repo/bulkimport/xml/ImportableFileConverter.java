@@ -15,7 +15,6 @@ import org.alfresco.repo.bulkimport.utils.AlfrescoReflectionUtils;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.Pair;
 import org.alfresco.util.Triple;
 import org.apache.log4j.Logger;
 
@@ -24,7 +23,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class ImportableFileConverter implements Converter {
 
@@ -34,9 +36,9 @@ public class ImportableFileConverter implements Converter {
   private File fileImportRootLocation;
   private Mapper mapper;
   private NamespacePrefixResolver namespaceService;
-  private final List<Triple<NodeAssociation,Object,Object>> assocsStack;
+  private final List<Triple<NodeAssociation, Object, Object>> assocsStack;
 
-  public ImportableFileConverter(File fileImportRootLocation, Mapper mapper, ServiceRegistry serviceRegistry, List<Triple<NodeAssociation,Object,Object>> assocsStack) {
+  public ImportableFileConverter(File fileImportRootLocation, Mapper mapper, ServiceRegistry serviceRegistry, List<Triple<NodeAssociation, Object, Object>> assocsStack) {
     this.fileImportRootLocation = fileImportRootLocation;
     this.mapper = mapper;
     this.namespaceService = serviceRegistry.getNamespaceService();
@@ -104,14 +106,14 @@ public class ImportableFileConverter implements Converter {
 
       //Handling node properties
       for (QName propertyName : nodeProperties.keySet()) {
-        String nodeName = (String)nodeProperties.get(propertyName);
+        String nodeName = (String) nodeProperties.get(propertyName);
         if (nodeName != null) {
           properties.put(propertyName.toPrefixString(namespaceService), nodeName);
         }
       }
 
       // Handling associations
-      List<Triple<NodeAssociation,Object,Object>> assocs = AlfrescoReflectionUtils.getAlfrescoAssocs(currentObject);
+      List<Triple<NodeAssociation, Object, Object>> assocs = AlfrescoReflectionUtils.getAlfrescoAssocs(currentObject);
       this.assocsStack.addAll(assocs);
 
       if (AlfrescoReflectionUtils.isContainer(currentClass)) {

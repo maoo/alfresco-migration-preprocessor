@@ -4,8 +4,6 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.bulkimport.annotations.NodeAssociation;
 import org.alfresco.repo.bulkimport.beans.Content;
 import org.alfresco.repo.bulkimport.beans.Folder;
-import org.alfresco.repo.bulkimport.impl.MultiThreadedBulkFilesystemImporter;
-import org.alfresco.repo.bulkimport.impl.StreamingNodeImporterFactory;
 import org.alfresco.repo.bulkimport.utils.AlfrescoFileImportUtils;
 import org.alfresco.repo.bulkimport.utils.AlfrescoReflectionUtils;
 import org.alfresco.repo.bulkimport.xml.AlfrescoXStreamMarshaller;
@@ -17,7 +15,6 @@ import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.*;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ApplicationContextHelper;
-import org.alfresco.util.Pair;
 import org.alfresco.util.Triple;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
@@ -81,8 +78,8 @@ public class ImportableFileTest {
     assertTrue(metaFile.exists());
     File binaryFile = AlfrescoFileImportUtils.getBinaryFile(nodeProperties, marshaller.getFileImportRootLocation());
     assertTrue(binaryFile.exists());
-    log.info("Renaming "+marshaller.getFileImportRootLocation().getAbsolutePath());
-    marshaller.getFileImportRootLocation().renameTo(new File(marshaller.getFileImportRootLocation().getParent(),new Date().getTime()+""));
+    log.info("Renaming " + marshaller.getFileImportRootLocation().getAbsolutePath());
+    marshaller.getFileImportRootLocation().renameTo(new File(marshaller.getFileImportRootLocation().getParent(), new Date().getTime() + ""));
     marshaller.clearContents();
   }
 
@@ -91,8 +88,8 @@ public class ImportableFileTest {
     Source source = new StreamSource(folder1.openStream());
     Folder folder = (Folder) marshaller.unmarshal(source);
     assertEquals(3, folder.getChildren().size());
-    log.info("Renaming "+marshaller.getFileImportRootLocation().getAbsolutePath());
-    marshaller.getFileImportRootLocation().renameTo(new File(marshaller.getFileImportRootLocation().getParent(),new Date().getTime()+""));
+    log.info("Renaming " + marshaller.getFileImportRootLocation().getAbsolutePath());
+    marshaller.getFileImportRootLocation().renameTo(new File(marshaller.getFileImportRootLocation().getParent(), new Date().getTime() + ""));
     marshaller.clearContents();
   }
 
@@ -101,16 +98,16 @@ public class ImportableFileTest {
     Source source = new StreamSource(folder2.openStream());
     Folder folder = (Folder) marshaller.unmarshal(source);
     assertEquals(3, folder.getChildren().size());
-    List<Triple<NodeAssociation,Object,Object>> assocs = marshaller.getAssocsStack();
+    List<Triple<NodeAssociation, Object, Object>> assocs = marshaller.getAssocsStack();
     assertNotNull(assocs);
-    for(Triple<NodeAssociation,Object,Object> assoc : assocs) {
-      Content referencing = (Content)assoc.getSecond();
+    for (Triple<NodeAssociation, Object, Object> assoc : assocs) {
+      Content referencing = (Content) assoc.getSecond();
       Object referenced = assoc.getThird();
-      log.info("\nAssoc name: "+assoc.getFirst().name()+"\nFrom: "+referencing.getName()+ "\nTo: "+referenced);
+      log.info("\nAssoc name: " + assoc.getFirst().name() + "\nFrom: " + referencing.getName() + "\nTo: " + referenced);
     }
-    assertEquals(6,assocs.size());
-    log.info("Renaming "+marshaller.getFileImportRootLocation().getAbsolutePath());
-    marshaller.getFileImportRootLocation().renameTo(new File(marshaller.getFileImportRootLocation().getParent(),new Date().getTime()+""));
+    assertEquals(6, assocs.size());
+    log.info("Renaming " + marshaller.getFileImportRootLocation().getAbsolutePath());
+    marshaller.getFileImportRootLocation().renameTo(new File(marshaller.getFileImportRootLocation().getParent(), new Date().getTime() + ""));
     marshaller.clearContents();
   }
 
@@ -129,9 +126,9 @@ public class ImportableFileTest {
         new StreamSource(folder1.openStream()),
         new StreamSource(folder2.openStream())
     });
-    List<Object> unmarshalled = xmlBulkImporter.bulkImport(importedFolder,sources);
+    List<Object> unmarshalled = xmlBulkImporter.bulkImport(importedFolder, sources);
     assertNotNull(unmarshalled);
-    assertNotSame(0,unmarshalled.size());
+    assertNotSame(0, unmarshalled.size());
 
     List<FileInfo> children = fileFolderService.list(importedFolder);
     assertNotNull(children);
