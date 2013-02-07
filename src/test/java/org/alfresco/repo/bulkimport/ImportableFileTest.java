@@ -9,6 +9,7 @@ import org.alfresco.repo.bulkimport.impl.StreamingNodeImporterFactory;
 import org.alfresco.repo.bulkimport.utils.AlfrescoFileImportUtils;
 import org.alfresco.repo.bulkimport.utils.AlfrescoReflectionUtils;
 import org.alfresco.repo.bulkimport.xml.AlfrescoXStreamMarshaller;
+import org.alfresco.repo.bulkimport.xml.XmlBulkImporter;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.model.FileFolderService;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -47,10 +49,9 @@ public class ImportableFileTest {
 
   protected static ApplicationContext applicationContext;
 
-  protected static AlfrescoXStreamMarshaller marshaller;
-  protected static NodeService nodeService;
-  private static StreamingNodeImporterFactory streamingNodeImporterFactory;
-  private static BulkFilesystemImporter bulkImporter;
+  private static AlfrescoXStreamMarshaller marshaller;
+  private static NodeService nodeService;
+  private static XmlBulkImporter xmlBulkImporter;
   private static Repository repositoryHelper;
   private static FileFolderService fileFolderService;
   private static ContentService contentService;
@@ -60,10 +61,9 @@ public class ImportableFileTest {
     ApplicationContextHelper.setUseLazyLoading(false);
     ApplicationContextHelper.setNoAutoStart(true);
     applicationContext = ApplicationContextHelper.getApplicationContext(new String[]{"classpath:alfresco/application-context.xml"});
-    marshaller = (AlfrescoXStreamMarshaller) applicationContext.getBean("configuredMarshaller");
     nodeService = (NodeService) applicationContext.getBean("NodeService");
-    streamingNodeImporterFactory = (StreamingNodeImporterFactory) applicationContext.getBean("streamingNodeImporterFactory");
-    bulkImporter = (MultiThreadedBulkFilesystemImporter) applicationContext.getBean("bulkFilesystemImporter");
+    marshaller = (AlfrescoXStreamMarshaller) applicationContext.getBean("alfrescoMarshaller");
+    xmlBulkImporter = (XmlBulkImporter) applicationContext.getBean("alfrescoXmlBulkImporter");
     repositoryHelper = (Repository) applicationContext.getBean("repositoryHelper");
     fileFolderService = (FileFolderService) applicationContext.getBean("FileFolderService");
     contentService = (ContentService) applicationContext.getBean("ContentService");
@@ -81,6 +81,9 @@ public class ImportableFileTest {
     assertTrue(metaFile.exists());
     File binaryFile = AlfrescoFileImportUtils.getBinaryFile(nodeProperties, marshaller.getFileImportRootLocation());
     assertTrue(binaryFile.exists());
+    log.info("Renaming "+marshaller.getFileImportRootLocation().getAbsolutePath());
+    marshaller.getFileImportRootLocation().renameTo(new File(marshaller.getFileImportRootLocation().getParent(),new Date().getTime()+""));
+    marshaller.getFileImportRootLocation().mkdir();
   }
 
   @Test
@@ -88,6 +91,9 @@ public class ImportableFileTest {
     Source source = new StreamSource(folder1.openStream());
     Folder folder = (Folder) marshaller.unmarshal(source);
     assertEquals(3, folder.getChildren().size());
+    log.info("Renaming "+marshaller.getFileImportRootLocation().getAbsolutePath());
+    marshaller.getFileImportRootLocation().renameTo(new File(marshaller.getFileImportRootLocation().getParent(),new Date().getTime()+""));
+    marshaller.getFileImportRootLocation().mkdir();
   }
 
   @Test
@@ -103,6 +109,9 @@ public class ImportableFileTest {
       log.info("\nAssoc name: "+assoc.getFirst().name()+"\nFrom: "+referencing.getName()+ "\nTo: "+referenced);
     }
     assertEquals(6,assocs.size());
+    log.info("Renaming "+marshaller.getFileImportRootLocation().getAbsolutePath());
+    marshaller.getFileImportRootLocation().renameTo(new File(marshaller.getFileImportRootLocation().getParent(),new Date().getTime()+""));
+    marshaller.getFileImportRootLocation().mkdir();
   }
 
   @Test
@@ -114,15 +123,14 @@ public class ImportableFileTest {
 
     assertTrue(nodeService.exists(importedFolder));
 
-    NodeImporter nodeImporter = streamingNodeImporterFactory.getNodeImporter(marshaller.getFileImportRootLocation());
-    BulkImportParameters bulkImportParameters = new BulkImportParameters();
-    bulkImportParameters.setTarget(importedFolder);
-    //@TODO - replaceExisting should be false, but tests fail and they should not
-    //Maybe a FileImport issue?
-    bulkImportParameters.setReplaceExisting(true);
-    bulkImportParameters.setDisableRulesService(true);
-    bulkImportParameters.setBatchSize(40);
-    bulkImporter.bulkImport(bulkImportParameters, nodeImporter);
+    List<Source> sources = Arrays.asList(new Source[]{
+        new StreamSource(content1.openStream()),
+        new StreamSource(folder1.openStream()),
+        new StreamSource(folder2.openStream())
+    });
+    List<Object> unmarshalled = xmlBulkImporter.bulkImport(importedFolder,sources);
+    assertNotNull(unmarshalled);
+    assertNotSame(0,unmarshalled.size());
 
     List<FileInfo> children = fileFolderService.list(importedFolder);
     assertNotNull(children);
@@ -130,13 +138,9 @@ public class ImportableFileTest {
       if (fileInfo.isFolder()) {
         assertFolder(fileInfo);
       } else {
-        assertContent(fileInfo);
+        assertContent(fileInfo.getNodeRef());
       }
     }
-  }
-
-  private void assertContent(FileInfo fileInfo) {
-    assertContent(fileInfo.getNodeRef());
   }
 
   private void assertContent(NodeRef nodeRef) {
@@ -153,7 +157,7 @@ public class ImportableFileTest {
   }
 
   private void assertFolder(FileInfo fileInfo) {
-    log.info("Asserting folder " + fileInfo.getName());
+    log.info("Asserting folder \n" + nodeService.getProperties(fileInfo.getNodeRef()));
     NodeRef nodeRef = fileInfo.getNodeRef();
     assertEquals(ContentModel.TYPE_FOLDER, nodeService.getType(nodeRef));
     assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE));
