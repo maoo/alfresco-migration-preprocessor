@@ -97,12 +97,17 @@ public class ImportableFileConverter implements Converter {
       for (QName aspect : nodeAspects) {
         aspects += aspect.toPrefixString(namespaceService) + ",";
       }
-      aspects = aspects.substring(0, aspects.length() - 1);
+      if (aspects.length() > 0) {
+        aspects = aspects.substring(0, aspects.length() - 1);
+      }
       properties.put(AlfrescoReflectionUtils.PROPERTY_NAME_ASPECTS, aspects);
 
       //Handling node properties
       for (QName propertyName : nodeProperties.keySet()) {
-        properties.put(propertyName.toPrefixString(namespaceService), nodeProperties.get(propertyName));
+        String nodeName = (String)nodeProperties.get(propertyName);
+        if (nodeName != null) {
+          properties.put(propertyName.toPrefixString(namespaceService), nodeName);
+        }
       }
 
       // Handling associations

@@ -73,7 +73,6 @@ public class ImportableFileTest {
 
   @Test
   public void fileExists() throws IOException, InvocationTargetException, IllegalAccessException {
-    marshaller = (AlfrescoXStreamMarshaller) applicationContext.getBean("alfrescoMarshaller");
     Source source = new StreamSource(content1.openStream());
     Object unmarshalled = marshaller.unmarshal(source);
     assertEquals(Content.class, unmarshalled.getClass());
@@ -89,7 +88,6 @@ public class ImportableFileTest {
 
   @Test
   public void unmarshalFolder() throws IOException {
-    marshaller = (AlfrescoXStreamMarshaller) applicationContext.getBean("alfrescoMarshaller");
     Source source = new StreamSource(folder1.openStream());
     Folder folder = (Folder) marshaller.unmarshal(source);
     assertEquals(3, folder.getChildren().size());
@@ -100,7 +98,6 @@ public class ImportableFileTest {
 
   @Test
   public void unmarshalFolder2() throws IOException {
-    marshaller = (AlfrescoXStreamMarshaller) applicationContext.getBean("alfrescoMarshaller");
     Source source = new StreamSource(folder2.openStream());
     Folder folder = (Folder) marshaller.unmarshal(source);
     assertEquals(3, folder.getChildren().size());
@@ -120,7 +117,6 @@ public class ImportableFileTest {
 
   @Test
   public void runFileImport() throws IOException, InvocationTargetException, IllegalAccessException {
-    marshaller = (AlfrescoXStreamMarshaller) applicationContext.getBean("alfrescoMarshaller");
     NodeRef importedFolder = fileFolderService.create(
         repositoryHelper.getCompanyHome(),
         "bulkImport-" + (new Date()).getTime(),

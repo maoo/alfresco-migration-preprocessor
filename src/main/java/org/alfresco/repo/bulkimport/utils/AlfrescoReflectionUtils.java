@@ -92,7 +92,7 @@ public class AlfrescoReflectionUtils {
         }
       }
     }
-    log.debug("[Added Alfresco Aspects] " + aspects.toArray());
+    log.debug("[Added Alfresco Aspects] " + aspects.size());
     return aspects.toArray(new QName[]{});
   }
 
