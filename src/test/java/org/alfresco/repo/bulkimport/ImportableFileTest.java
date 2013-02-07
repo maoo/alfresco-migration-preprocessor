@@ -15,6 +15,7 @@ import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.*;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ApplicationContextHelper;
+import org.alfresco.util.Triple;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class ImportableFileTest {
   static Logger log = Logger.getLogger(ImportableFileTest.class);
   private static URL content1 = ClassLoader.getSystemClassLoader().getResource("content1.xml");
   private static URL folder1 = ClassLoader.getSystemClassLoader().getResource("folder1.xml");
-  //private static URL folder2 = ClassLoader.getSystemClassLoader().getResource("folder2.xml");
+  private static URL folder2 = ClassLoader.getSystemClassLoader().getResource("folder2.xml");
 
   protected static ApplicationContext applicationContext;
 
@@ -69,17 +70,10 @@ public class ImportableFileTest {
   }
 
   @Test
-  public void unmarshalContent() throws IOException {
-    Source source = new StreamSource(content1.openStream());
-    Object unmarshalled = marshaller.unmarshal(source);
-    assertEquals(Content.class, unmarshalled.getClass());
-    Content content = (Content) unmarshalled;
-  }
-
-  @Test
   public void fileExists() throws IOException, InvocationTargetException, IllegalAccessException {
     Source source = new StreamSource(content1.openStream());
     Object unmarshalled = marshaller.unmarshal(source);
+    assertEquals(Content.class, unmarshalled.getClass());
     Map<QName, Serializable> nodeProperties = AlfrescoReflectionUtils.getAlfrescoMeta(unmarshalled);
     File metaFile = AlfrescoFileImportUtils.getMetaFile(nodeProperties, marshaller.getFileImportRootLocation());
     assertTrue(metaFile.exists());
@@ -94,12 +88,18 @@ public class ImportableFileTest {
     assertEquals(3, folder.getChildren().size());
   }
 
-//  @Test
-//  public void unmarshalFolder2() throws IOException {
-//    Source source = new StreamSource(folder2.openStream());
-//    Folder folder = (Folder) marshaller.unmarshal(source);
-//    assertEquals(3, folder.getChildren().size());
-//  }
+  @Test
+  public void unmarshalFolder2() throws IOException {
+    Source source = new StreamSource(folder2.openStream());
+    Folder folder = (Folder) marshaller.unmarshal(source);
+    assertEquals(3, folder.getChildren().size());
+    List<Triple<QName,QName,String>> assocs = marshaller.getAssocsStack();
+    assertNotNull(assocs);
+    for(Triple<QName,QName,String> assoc : assocs) {
+      log.info("Assoc: "+assoc.getFirst()+" "+assoc.getSecond()+" "+assoc.getThird());
+    }
+    assertEquals(6,assocs.size());
+  }
 
   @Test
   public void runFileImport() throws IOException {
@@ -113,6 +113,8 @@ public class ImportableFileTest {
     NodeImporter nodeImporter = streamingNodeImporterFactory.getNodeImporter(marshaller.getFileImportRootLocation());
     BulkImportParameters bulkImportParameters = new BulkImportParameters();
     bulkImportParameters.setTarget(importedFolder);
+    //@TODO - replaceExisting should be false, but tests fail and they should not
+    //Maybe a FileImport issue?
     bulkImportParameters.setReplaceExisting(true);
     bulkImportParameters.setDisableRulesService(true);
     bulkImportParameters.setBatchSize(40);
@@ -134,6 +136,7 @@ public class ImportableFileTest {
   }
 
   private void assertContent(NodeRef nodeRef) {
+    log.info("Asserting content " + nodeService.getProperty(nodeRef, ContentModel.PROP_NAME));
     assertEquals(ContentModel.TYPE_CONTENT, nodeService.getType(nodeRef));
     assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE));
     assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_GEN_CLASSIFIABLE));
@@ -146,13 +149,14 @@ public class ImportableFileTest {
   }
 
   private void assertFolder(FileInfo fileInfo) {
+    log.info("Asserting folder " + fileInfo.getName());
     NodeRef nodeRef = fileInfo.getNodeRef();
     assertEquals(ContentModel.TYPE_FOLDER, nodeService.getType(nodeRef));
     assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE));
     assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_GEN_CLASSIFIABLE));
     assertTrue(nodeService.hasAspect(nodeRef, ContentModel.ASPECT_AUDITABLE));
-    assertEquals("foldername", nodeService.getProperty(nodeRef, ContentModel.PROP_NAME));
-    assertEquals("Folder Title", nodeService.getProperty(nodeRef, ContentModel.PROP_TITLE));
+    assertTrue(((String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME)).startsWith("foldername"));
+    assertTrue(((String) nodeService.getProperty(nodeRef, ContentModel.PROP_TITLE)).startsWith("Folder Title"));
     List<ChildAssociationRef> children = nodeService.getChildAssocs(nodeRef);
     for (ChildAssociationRef child : children) {
       assertContent(child.getChildRef());

@@ -131,7 +131,7 @@ public class AlfrescoReflectionUtils {
   }
 
   public static List<Triple<QName, QName, String>> getAlfrescoAssocs(Object currentObject) {
-    List<Triple<QName,QName,String>> ret = new ArrayList<Triple<QName,QName,String>>();
+    List<Triple<QName, QName, String>> ret = new ArrayList<Triple<QName, QName, String>>();
     for (Field field : currentObject.getClass().getDeclaredFields()) {
       NodeAssociation nodeAssociation = field.getAnnotation(NodeAssociation.class);
       if (nodeAssociation != null) {

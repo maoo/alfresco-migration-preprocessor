@@ -22,10 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class ImportableFileConverter implements Converter {
 
@@ -36,11 +33,13 @@ public class ImportableFileConverter implements Converter {
   private File fileImportRootLocation;
   private Mapper mapper;
   private NamespacePrefixResolver namespaceService;
+  private final List<Triple<QName, QName, String>> assocsStack;
 
-  public ImportableFileConverter(File fileImportRootLocation, Mapper mapper, ServiceRegistry serviceRegistry) {
+  public ImportableFileConverter(File fileImportRootLocation, Mapper mapper, ServiceRegistry serviceRegistry, List<Triple<QName, QName, String>> assocsStack) {
     this.fileImportRootLocation = fileImportRootLocation;
     this.mapper = mapper;
     this.namespaceService = serviceRegistry.getNamespaceService();
+    this.assocsStack = assocsStack;
   }
 
   @Override
@@ -73,11 +72,13 @@ public class ImportableFileConverter implements Converter {
     Class currentClass = context.getRequiredType();
     try {
       if (AlfrescoReflectionUtils.isContainer(currentClass)) {
-        //Create the folder
+        //Create the folder; since we don't know the name yet, we will create the folder with a timestamp name
+        //After unmarshalling the Object with the JavaBeanConverter, we will rename the folder with its real name
         String folderName = (new Date()).getTime() + "";
-        File folder = AlfrescoFileImportUtils.getFolder(folderName, fileImportCurrentLocation);
+        File folder = AlfrescoFileImportUtils.createFolder(folderName, fileImportCurrentLocation);
 
-        //Register the folder as current rootFolder where to import the other upcoming items
+        //Register the folder as current rootFolder where to import all node entities defined
+        // within the context of the current object
         context.put(CURRENT_FOLDER_CONTEXT_PARAM, folder);
       }
       Converter javaBeanConverter = new JavaBeanConverter(this.mapper);
@@ -105,21 +106,18 @@ public class ImportableFileConverter implements Converter {
         properties.put(propertyName.toPrefixString(namespaceService), nodeProperties.get(propertyName));
       }
 
-//      Handling associations
-//      List<Triple<QName,QName,String>> assocs = AlfrescoReflectionUtils.getAlfrescoAssocs(currentObject);
-//      List<Triple<QName,QName,String>> currentAssocs = (List<Triple<QName,QName,String>>)context.get(ASSOCS_CONTEXT_PARAM);
-//      if (currentAssocs != null) {
-//        currentAssocs.addAll(assocs);
-//      }
-//      context.put(ASSOCS_CONTEXT_PARAM,currentAssocs);
+      // Handling associations
+      List<Triple<QName, QName, String>> assocs = AlfrescoReflectionUtils.getAlfrescoAssocs(currentObject);
+      this.assocsStack.addAll(assocs);
 
       if (AlfrescoReflectionUtils.isContainer(currentClass)) {
+        //Rename the folder to its real name
         String name = (String) nodeProperties.get(ContentModel.PROP_NAME);
         File currentFolder = (File) context.get(CURRENT_FOLDER_CONTEXT_PARAM);
         File parent = currentFolder.getParentFile();
-
-        //Rename the folder and update the currentRootFolder with the parent
         currentFolder.renameTo(new File(parent, name));
+
+        //Register the current parent's folder as current rootFolder where to import next node entities
         context.put(CURRENT_FOLDER_CONTEXT_PARAM, parent);
         log.debug(
             "[ImportableFileConverter] folder " +
@@ -127,13 +125,17 @@ public class ImportableFileConverter implements Converter {
                 "completed; adding parent as new root");
       } else {
         String contentUrl = AlfrescoReflectionUtils.getContentUrl(currentObject);
-        log.debug("[ImportableFileConverter] importing content from url " + contentUrl);
-        File metaFile = AlfrescoFileImportUtils.getBinaryFile(nodeProperties, fileImportCurrentLocation);
-        AlfrescoFileImportUtils.fetchBinaryContent(metaFile, contentUrl);
+        if (contentUrl != null) {
+          log.debug("[ImportableFileConverter] importing content from url " + contentUrl);
+          File metaFile = AlfrescoFileImportUtils.getBinaryFile(nodeProperties, fileImportCurrentLocation);
+          AlfrescoFileImportUtils.fetchBinaryContent(metaFile, contentUrl);
+        }
       }
 
-      //Handling meta File creation
+      //Creating Meta file and storing Meta Properties
       File metaFile = AlfrescoFileImportUtils.getMetaFile(nodeProperties, fileImportCurrentLocation);
+      fos = new FileOutputStream(metaFile);
+      properties.storeToXML(fos, null);
 
       log.debug(
           "[ImportableFileConverter.unmarshal] current class: " + currentClass +
@@ -141,29 +143,21 @@ public class ImportableFileConverter implements Converter {
               "alfresco properties: " + nodeProperties +
               "meta File: " + metaFile.getAbsolutePath());
 
-      //Store Properties into file
-      fos = new FileOutputStream(metaFile);
-      properties.storeToXML(fos, null);
-
     } catch (InvocationTargetException e) {
-      handleException(currentClass, e);
+      AlfrescoFileImportUtils.handleException(currentClass, e);
     } catch (IllegalAccessException e) {
-      handleException(currentClass, e);
+      AlfrescoFileImportUtils.handleException(currentClass, e);
     } catch (IOException e) {
-      handleException(currentClass, e);
+      AlfrescoFileImportUtils.handleException(currentClass, e);
     } finally {
       if (fos != null) {
         try {
           fos.close();
         } catch (IOException e) {
-          handleException(currentObject, e);
+          AlfrescoFileImportUtils.handleException(currentObject, e);
         }
       }
     }
     return currentObject;
-  }
-
-  private void handleException(Object currentObject, Throwable e) {
-    throw new IllegalStateException("Error convering object " + currentObject, e);
   }
 }

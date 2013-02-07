@@ -1,7 +1,7 @@
 <folder>
-  <name>foldername</name>
-  <title>Folder Title</title>
-  <description>the most awesome folder ever</description>
+  <name>foldername2</name>
+  <title>Folder Title 2</title>
+  <description>the most awesome folder ever 2</description>
   <isVersionable>true</isVersionable>
   <children>
     <content>
@@ -9,10 +9,9 @@
       <title>Content Title 4</title>
       <description>the most awesome content ever 4</description>
       <isVersionable>true</isVersionable>
-      <contentUrl>http://www.scala-lang.org/docu/files/ScalaByExample.pdf</contentUrl>
       <referenceNames>
-        <string>categoryname1</string>
-        <string>categoryname2</string>
+        <string>contentname1</string>
+        <string>contentname2</string>
       </referenceNames>
     </content>
     <content>
@@ -20,10 +19,9 @@
       <title>Content Title 5</title>
       <description>the most awesome content ever 5</description>
       <isVersionable>true</isVersionable>
-      <contentUrl>http://www.tug.org/pracjourn/2005-4/mertz/mertz.pdf</contentUrl>
       <referenceNames>
-        <string>categoryname2</string>
-        <string>categoryname3</string>
+        <string>contentname2</string>
+        <string>contentname3</string>
       </referenceNames>
     </content>
     <content>
@@ -31,10 +29,9 @@
       <title>Content Title 6</title>
       <description>the most awesome content ever 5</description>
       <isVersionable>true</isVersionable>
-      <contentUrl>http://www.jemander.se/MercurialByExample.pdf</contentUrl>
       <referenceNames>
-        <string>categoryname1</string>
-        <string>categoryname3</string>
+        <string>contentname1</string>
+        <string>contentname3</string>
       </referenceNames>
     </content>
   </children>

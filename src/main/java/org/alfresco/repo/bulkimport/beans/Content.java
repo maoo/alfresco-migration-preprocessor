@@ -31,15 +31,15 @@ public final class Content {
   @XStreamAlias("isVersionable")
   private String versionable;
 
-//  @NodeAssociation(
-//      name = "references",
-//      namespace = "http://www.alfresco.org/bulkimport/model/content/1.0",
-//      fieldName = "referenceNames",
-//      fkPropertyName = "{http://www.alfresco.org/bulkimport/model/content/1.0}name",
-//      fkPropertyType = "{http://www.alfresco.org/bulkimport/model/content/1.0}content")
-//  private List<Content> references;
-//
-//  private String[] referenceNames;
+  @NodeAssociation(
+      name = "references",
+      namespace = "http://www.alfresco.org/bulkimport/model/content/1.0",
+      fieldName = "referenceNames",
+      fkPropertyName = "{http://www.alfresco.org/bulkimport/model/content/1.0}name",
+      fkPropertyType = "{http://www.alfresco.org/bulkimport/model/content/1.0}content")
+  private List<Content> references;
+
+  private String[] referenceNames;
 
   @Override
   public String toString() {
@@ -90,19 +90,19 @@ public final class Content {
     this.contentUrl = contentUrl;
   }
 
-//  public List<Content> getReferences() {
-//    return references;
-//  }
-//
-//  public void setReferences(List<Content> references) {
-//    this.references = references;
-//  }
-//
-//  public String[] getReferenceNames() {
-//    return referenceNames;
-//  }
-//
-//  public void setReferenceNames(String[] referenceNames) {
-//    this.referenceNames = referenceNames;
-//  }
+  public List<Content> getReferences() {
+    return references;
+  }
+
+  public void setReferences(List<Content> references) {
+    this.references = references;
+  }
+
+  public String[] getReferenceNames() {
+    return referenceNames;
+  }
+
+  public void setReferenceNames(String[] referenceNames) {
+    this.referenceNames = referenceNames;
+  }
 }

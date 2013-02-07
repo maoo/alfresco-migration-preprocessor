@@ -5,12 +5,14 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.bulkimport.MetadataLoader;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
@@ -32,26 +34,22 @@ public class AlfrescoFileImportUtils {
         log.error(error);
       } else {
         final byte[] responseBody = method.getResponseBody();
-        fos = new FileOutputStream(file);
 
         if (responseBody != null) {
+          fos = new FileOutputStream(file);
           fos.write(responseBody);
         } else {
           log.error(String.format("Response body for url '%s' is null; status code: %s", url, statusCode));
         }
       }
-    } catch (HttpException e) {
-      throw new IllegalStateException(e);
-    } catch (FileNotFoundException e) {
-      throw new IllegalStateException(e);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      AlfrescoFileImportUtils.handleException(file, e);
     } finally {
       if (fos != null) {
         try {
           fos.close();
         } catch (IOException e) {
-          throw new IllegalStateException(e);
+          AlfrescoFileImportUtils.handleException(file, e);
         }
       }
     }
@@ -74,12 +72,16 @@ public class AlfrescoFileImportUtils {
     return new File(fileImportRootLocation, name);
   }
 
-  public static File getFolder(String folderName, File fileImportRootLocation) {
+  public static File createFolder(String folderName, File fileImportRootLocation) {
     if (StringUtil.isEmpty(folderName)) {
       folderName = (new Date()).getTime() + "";
     }
     File folder = new File(fileImportRootLocation, folderName);
     folder.mkdir();
     return folder;
+  }
+
+  public static void handleException(Object currentObject, Throwable e) {
+    throw new IllegalStateException("Error convering object " + currentObject, e);
   }
 }
