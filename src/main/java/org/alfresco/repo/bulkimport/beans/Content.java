@@ -19,6 +19,9 @@ public final class Content {
   private String name;
 
   @NodeProperty
+  private Long id;
+
+  @NodeProperty
   private String title;
 
   @NodeProperty
@@ -104,5 +107,13 @@ public final class Content {
 
   public void setReferenceNames(String[] referenceNames) {
     this.referenceNames = referenceNames;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
   }
 }

@@ -9,6 +9,8 @@ import org.alfresco.repo.bulkimport.utils.AlfrescoFileImportUtils;
 import org.alfresco.repo.bulkimport.utils.AlfrescoReflectionUtils;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -38,6 +40,7 @@ public class XmlBulkImporter {
   private NamespaceService namespaceService;
   private SearchService searchService;
   private NodeService nodeService;
+  private DictionaryService dictionaryService;
 
   public XmlBulkImporter(StreamingNodeImporterFactory streamingNodeImporterFactory, AlfrescoXStreamMarshaller marshaller, ServiceRegistry serviceRegistry) {
     this.nodeImporter = streamingNodeImporterFactory.getNodeImporter(marshaller.getFileImportRootLocation());
@@ -51,6 +54,7 @@ public class XmlBulkImporter {
     this.namespaceService = serviceRegistry.getNamespaceService();
     this.searchService = serviceRegistry.getSearchService();
     this.nodeService = serviceRegistry.getNodeService();
+    this.dictionaryService = serviceRegistry.getDictionaryService();
   }
 
   public List bulkImport(NodeRef targetFolder, List<Source> sources) throws IOException, InvocationTargetException, IllegalAccessException {
@@ -96,13 +100,14 @@ public class XmlBulkImporter {
           ftsQuery += "ASPECT:\"" + st.nextToken() + "\" AND ";
         }
       } else {
-        String propValue = (String) meta.get(propName);
-        ftsQuery += "@" + propName.toPrefixString(this.namespaceService) + ":\"" + propValue + "\" AND ";
+        PropertyDefinition propertyDef = dictionaryService.getProperty(propName);
+        if (propertyDef != null) {
+          String propValue = (String) meta.get(propName);
+          ftsQuery += "@" + propName.toPrefixString(this.namespaceService) + ":\"" + propValue + "\" AND ";
+        }
       }
     }
     ftsQuery = ftsQuery.substring(0, ftsQuery.length() - 5);
-
-    //ftsQuery = "@cm:name:contentname4";
 
     log.debug("Executing FTS query '" + ftsQuery + "'");
     ResultSet resultSet = this.searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, SearchService.LANGUAGE_FTS_ALFRESCO, ftsQuery);
