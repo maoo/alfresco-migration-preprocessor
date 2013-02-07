@@ -82,6 +82,6 @@ public class AlfrescoFileImportUtils {
   }
 
   public static void handleException(Object currentObject, Throwable e) {
-    throw new IllegalStateException("Error convering object " + currentObject, e);
+    throw new IllegalStateException("Error on object " + currentObject, e);
   }
 }

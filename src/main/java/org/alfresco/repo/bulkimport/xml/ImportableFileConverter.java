@@ -8,12 +8,14 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.bulkimport.annotations.NodeAssociation;
 import org.alfresco.repo.bulkimport.annotations.NodeType;
 import org.alfresco.repo.bulkimport.utils.AlfrescoFileImportUtils;
 import org.alfresco.repo.bulkimport.utils.AlfrescoReflectionUtils;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.Pair;
 import org.alfresco.util.Triple;
 import org.apache.log4j.Logger;
 
@@ -28,14 +30,13 @@ public class ImportableFileConverter implements Converter {
 
   static Logger log = Logger.getLogger(ImportableFileConverter.class);
   private static final Object CURRENT_FOLDER_CONTEXT_PARAM = "currentFolder";
-  private static final Object ASSOCS_CONTEXT_PARAM = "assocs";
 
   private File fileImportRootLocation;
   private Mapper mapper;
   private NamespacePrefixResolver namespaceService;
-  private final List<Triple<QName, QName, String>> assocsStack;
+  private final List<Triple<NodeAssociation,Object,Object>> assocsStack;
 
-  public ImportableFileConverter(File fileImportRootLocation, Mapper mapper, ServiceRegistry serviceRegistry, List<Triple<QName, QName, String>> assocsStack) {
+  public ImportableFileConverter(File fileImportRootLocation, Mapper mapper, ServiceRegistry serviceRegistry, List<Triple<NodeAssociation,Object,Object>> assocsStack) {
     this.fileImportRootLocation = fileImportRootLocation;
     this.mapper = mapper;
     this.namespaceService = serviceRegistry.getNamespaceService();
@@ -107,7 +108,7 @@ public class ImportableFileConverter implements Converter {
       }
 
       // Handling associations
-      List<Triple<QName, QName, String>> assocs = AlfrescoReflectionUtils.getAlfrescoAssocs(currentObject);
+      List<Triple<NodeAssociation,Object,Object>> assocs = AlfrescoReflectionUtils.getAlfrescoAssocs(currentObject);
       this.assocsStack.addAll(assocs);
 
       if (AlfrescoReflectionUtils.isContainer(currentClass)) {
@@ -148,6 +149,8 @@ public class ImportableFileConverter implements Converter {
     } catch (IllegalAccessException e) {
       AlfrescoFileImportUtils.handleException(currentClass, e);
     } catch (IOException e) {
+      AlfrescoFileImportUtils.handleException(currentClass, e);
+    } catch (NoSuchFieldException e) {
       AlfrescoFileImportUtils.handleException(currentClass, e);
     } finally {
       if (fos != null) {

@@ -1,6 +1,7 @@
 package org.alfresco.repo.bulkimport;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.bulkimport.annotations.NodeAssociation;
 import org.alfresco.repo.bulkimport.beans.Content;
 import org.alfresco.repo.bulkimport.beans.Folder;
 import org.alfresco.repo.bulkimport.impl.MultiThreadedBulkFilesystemImporter;
@@ -15,6 +16,7 @@ import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.*;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ApplicationContextHelper;
+import org.alfresco.util.Pair;
 import org.alfresco.util.Triple;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
@@ -93,10 +95,12 @@ public class ImportableFileTest {
     Source source = new StreamSource(folder2.openStream());
     Folder folder = (Folder) marshaller.unmarshal(source);
     assertEquals(3, folder.getChildren().size());
-    List<Triple<QName,QName,String>> assocs = marshaller.getAssocsStack();
+    List<Triple<NodeAssociation,Object,Object>> assocs = marshaller.getAssocsStack();
     assertNotNull(assocs);
-    for(Triple<QName,QName,String> assoc : assocs) {
-      log.info("Assoc: "+assoc.getFirst()+" "+assoc.getSecond()+" "+assoc.getThird());
+    for(Triple<NodeAssociation,Object,Object> assoc : assocs) {
+      Content referencing = (Content)assoc.getSecond();
+      Object referenced = assoc.getThird();
+      log.info("\nAssoc name: "+assoc.getFirst().name()+"\nFrom: "+referencing.getName()+ "\nTo: "+referenced);
     }
     assertEquals(6,assocs.size());
   }

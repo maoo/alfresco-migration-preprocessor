@@ -3,16 +3,14 @@ package org.alfresco.repo.bulkimport.utils;
 import com.google.gdata.util.common.base.StringUtil;
 import org.alfresco.repo.bulkimport.annotations.*;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.Pair;
 import org.alfresco.util.Triple;
 import org.apache.log4j.Logger;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AlfrescoReflectionUtils {
 
@@ -130,22 +128,33 @@ public class AlfrescoReflectionUtils {
     return null;
   }
 
-  public static List<Triple<QName, QName, String>> getAlfrescoAssocs(Object currentObject) {
-    List<Triple<QName, QName, String>> ret = new ArrayList<Triple<QName, QName, String>>();
+  public static List<Triple<NodeAssociation, Object,Object>> getAlfrescoAssocs(Object currentObject) throws NoSuchFieldException, IllegalAccessException {
+    List<Triple<NodeAssociation, Object,Object>> ret = new ArrayList<Triple<NodeAssociation, Object,Object>>();
     for (Field field : currentObject.getClass().getDeclaredFields()) {
       NodeAssociation nodeAssociation = field.getAnnotation(NodeAssociation.class);
       if (nodeAssociation != null) {
-        String fkPropertyName = nodeAssociation.fkPropertyName();
-        String fkPropertyType = nodeAssociation.fkPropertyType();
-        String fieldName = nodeAssociation.fieldName();
-        if (!StringUtil.isEmpty(fkPropertyName) &&
-            !StringUtil.isEmpty(fkPropertyType) &&
-            !StringUtil.isEmpty(fieldName)) {
-          ret.add(new Triple<QName, QName, String>(
-              QName.createQName(fkPropertyName),
-              QName.createQName(fkPropertyType),
-              fieldName
-          ));
+        String associationValuesFieldName = nodeAssociation.fieldName();
+        Field associationValuesField = currentObject.getClass().getDeclaredField(associationValuesFieldName);
+        if (associationValuesField == null) {
+          IllegalStateException e = new IllegalStateException("Field "+associationValuesFieldName+" is null on object "+currentObject);
+          AlfrescoFileImportUtils.handleException(currentObject, e);
+        }
+        associationValuesField.setAccessible(true);
+        Object fieldValue = associationValuesField.get(currentObject);
+        log.debug("[getAlfrescoAssocs] current fieldValue: "+fieldValue);
+        if (fieldValue != null) {
+          Collection fieldValueList = new ArrayList();
+          if (fieldValue instanceof String[]) {
+            fieldValueList = Arrays.asList((String[])fieldValue);
+          } else if (fieldValue instanceof Collection) {
+            fieldValueList = (Collection)fieldValue;
+          } else {
+            IllegalStateException e = new IllegalStateException("Peer associations only support String[] and Collection Java objects; cannot parse "+fieldValue);
+            AlfrescoFileImportUtils.handleException(currentObject, e);
+          }
+          for(Object associatedObject : fieldValueList) {
+            ret.add(new Triple<NodeAssociation, Object,Object>(nodeAssociation, currentObject,associatedObject));
+          }
         }
       }
     }
