@@ -12,8 +12,6 @@
       <list>
         <value>org.alfresco.repo.bulkimport.beans.Content</value>
         <value>org.alfresco.repo.bulkimport.beans.Folder</value>
-        <value>org.alfresco.repo.bulkimport.beans.CategoryRoot</value>
-        <value>org.alfresco.repo.bulkimport.beans.Category</value>
       </list>
     </property>
   </bean>
