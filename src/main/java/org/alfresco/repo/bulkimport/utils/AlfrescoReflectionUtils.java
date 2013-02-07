@@ -48,17 +48,6 @@ public class AlfrescoReflectionUtils {
     return ret;
   }
 
-  private static List<Field> getAllFields(Object obj) {
-    final List<Field> fields = new ArrayList<Field>();
-    ReflectionUtils.doWithFields(obj.getClass(), new ReflectionUtils.FieldCallback() {
-      @Override
-      public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
-        fields.add(field);
-      }
-    });
-    return fields;
-  }
-
   public static QName getNodeType(Object obj) throws InvocationTargetException, IllegalAccessException {
     NodeType nodeType = obj.getClass().getAnnotation(NodeType.class);
     if (nodeType != null) {
@@ -155,6 +144,17 @@ public class AlfrescoReflectionUtils {
       }
     }
     return ret;
+  }
+
+  private static List<Field> getAllFields(Object obj) {
+    final List<Field> fields = new ArrayList<Field>();
+    ReflectionUtils.doWithFields(obj.getClass(), new ReflectionUtils.FieldCallback() {
+      @Override
+      public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
+        fields.add(field);
+      }
+    });
+    return fields;
   }
 
   private static Field getField(Object object, String fieldName) {

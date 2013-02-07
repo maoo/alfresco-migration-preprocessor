@@ -1,0 +1,29 @@
+1. AlfrescoReflectionUtils: merge the following methods into one:
+ + getAlfrescoMeta
+ + getNodeType
+ + getNodeTypeAspects
+ + getNodeAspects
+
+2. Add listeners during conversion to inject custom behaviour:
++ Before the JavaBeanConverter gets invoked
++ Before the file/folder gets created
++ Before the meta properties get serialized into the XML file
++ When child/peer associations get handled
+
+3. Implement and register a default listener and delegate some logic (see #2)
+
+4. Use http://code.google.com/p/reflections to auto-wire into AlfrescoXStreamMarshaller:
++ XStream annotated beans
++ Custom (XStream) converters
++ Custom listeners
+
+5. Add multi-threading capabilities
+
+6. Simplify usage by using Spring, alfresco-global.properties and JMX
+
+7. Documentation (small blogpost on how to use it on API level)
+
+8. Alfresco Share Console page, which allows to
++ start/monitor XML uploading
++ see beans, converters and listeners being registered
+(preferably same of JMX)
