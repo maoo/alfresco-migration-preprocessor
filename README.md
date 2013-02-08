@@ -18,7 +18,7 @@ It also provides an [XmlBulkImporter](https://github.com/maoo/alfresco-migration
 
 You can see how to use it in [our JUnit test](https://github.com/maoo/alfresco-migration-preprocessor/blob/master/src/test/java/org/alfresco/repo/bulkimport/ImportableFileTest.java)
 
-Still not convinced? Imagine that you want to import the following 3 entities (1 cm:folder and 2 cm:content) into Alfresco:
+Still not convinced? Imagine that you want to import the following 3 entities (1 <code>cm:folder</code> and 2 <code>cm:content</code>) into Alfresco:
 
 ```
 <folder>
