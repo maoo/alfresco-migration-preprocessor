@@ -2,9 +2,9 @@ What is it
 ---
 Alfresco Migration Preprocessor is an incredibly long name for such a simple feature! This tool provides a marshaller object
 that is (currently) able to
-1. Unmarshal one or more XML sources and transform them into a FS file/folder structure
-2. Invoke the File Import (shipped with Alfresco 4.** versions) pointing to the previously created FS structure
-3. Post-process recorded peer associations and create them accordingly as soon as the import have finished
+* Unmarshal one or more XML sources and transform them into a FS file/folder structure
+* Invoke the File Import (shipped with Alfresco 4.** versions) pointing to the previously created FS structure
+* Post-process recorded peer associations and create them accordingly as soon as the import have finished
 
 How does it work
 ---
@@ -21,9 +21,9 @@ You can see how to use it in [our JUnit test](https://github.com/maoo/alfresco-m
 Run
 ---
 To run the test
-
+```
 mvn clean test -Ppurge
-
+```
 Files are created in alf_data_dev/xml
 XML files being imported are located in src/test/resources
 
