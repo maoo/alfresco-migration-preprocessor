@@ -4,11 +4,11 @@ Alfresco Migration Preprocessor is an incredibly long name for such a simple fea
 that is (currently) able to
 * Unmarshal one or more XML sources and transform them into a FS file/folder structure
 * Invoke the File Import (shipped with Alfresco 4.** versions) pointing to the previously created FS structure
-* Post-process recorded peer associations and create them accordingly as soon as the import have finished
+* Post-process recorded peer associations and create them accordingly, as soon as the import have finished
 
 How does it work
 ---
-The Migration preprocessor extends XStream - the famous XML (de)serializer library - providing an [AlfrescoXStreamMarshaller](https://github.com/maoo/alfresco-migration-preprocessor/blob/master/src/main/java/org/alfresco/repo/bulkimport/xml/AlfrescoXStreamMarshaller.java) object accepts the following inputs:
+The Migration preprocessor extends XStream - the famous XML (de)serializer library - providing an [AlfrescoXStreamMarshaller](https://github.com/maoo/alfresco-migration-preprocessor/blob/master/src/main/java/org/alfresco/repo/bulkimport/xml/AlfrescoXStreamMarshaller.java) object which accepts the following inputs:
 * One or more [Java Beans](https://github.com/maoo/alfresco-migration-preprocessor/tree/master/src/main/java/org/alfresco/repo/bulkimport/beans), containing
   * [XStream-based annotations](http://xstream.codehaus.org/annotations-tutorial.html) (i.e. XStreamAlias, XStreamImplicit, ...)
   * [Alfresco-based annotations](https://github.com/maoo/alfresco-migration-preprocessor/tree/master/src/main/java/org/alfresco/repo/bulkimport/annotations) (i.e. NodeProperty, or NodeAspect)
