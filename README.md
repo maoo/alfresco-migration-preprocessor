@@ -29,7 +29,7 @@ XML files being imported are located in src/test/resources
 
 Contribute
 ---
-Pick some tasks from [TODO.txt](https://github.com/maoo/alfresco-migration-preprocessor/blob/master/TODO.txt)
-Contribute ideas and nice to haves into [TODO.txt](https://github.com/maoo/alfresco-migration-preprocessor/blob/master/TODO.txt)
-Open [issues](https://github.com/maoo/alfresco-migration-preprocessor/issues)
-Provide comments and feedback on [commits](https://github.com/maoo/alfresco-migration-preprocessor/commits/master)
+* Pick some tasks from [TODO.txt](https://github.com/maoo/alfresco-migration-preprocessor/blob/master/TODO.txt)
+* Contribute ideas and nice to haves into [TODO.txt](https://github.com/maoo/alfresco-migration-preprocessor/blob/master/TODO.txt)
+* Open [issues](https://github.com/maoo/alfresco-migration-preprocessor/issues)
+* Provide comments and feedback on [commits](https://github.com/maoo/alfresco-migration-preprocessor/commits/master)
