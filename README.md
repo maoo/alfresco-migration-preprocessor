@@ -48,7 +48,7 @@ Still not convinced? Imagine that you want to import the following 3 entities (1
 </folder>
 ```
 
-Now you can do it without writing one single line of code.
+Now you can do it without writing one single line of code.<br/>
 You have a different input XML? Define Java Beans with fields and annotations that map your XML structure and you're ready to go!
 
 Run
@@ -57,8 +57,8 @@ To run the test
 ```
 mvn clean test -Ppurge
 ```
-Files are created in alf_data_dev/xml
-XML files being imported are located in src/test/resources
+* Files are created in <code>alf_data_dev/xml</code>
+* XML files being imported are located in <code>src/test/resources</code>
 
 Contribute
 ---
