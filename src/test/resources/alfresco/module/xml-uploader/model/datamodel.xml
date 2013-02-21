@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="td:datamodel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+  <description>Tradedoubler Data Model</description>
+  <author>Maurizio Pillitu</author>
+  <version>1.0</version>
+
+  <imports>
+    <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+    <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+  </imports>
+
+  <namespaces>
+    <namespace uri="http:/alfresco.com/examples/tradedoubler" prefix="td"/>
+  </namespaces>
+
+  <types>
+    <type name="td:product">
+      <title>Tradedoubler Product</title>
+      <description>Tradedoubler Product</description>
+      <parent>cm:content</parent>
+      <properties>
+        <property name="td:productUrl">
+          <type>d:text</type>
+        </property>
+        <property name="td:imageUrl">
+          <type>d:text</type>
+        </property>
+        <property name="td:price">
+          <type>d:text</type>
+        </property>
+        <property name="td:currency">
+          <type>d:text</type>
+        </property>
+        <property name="td:productId">
+          <type>d:text</type>
+        </property>
+        <property name="td:categoryId">
+          <type>d:text</type>
+        </property>
+        <property name="td:categoryName">
+          <type>d:text</type>
+        </property>
+        <property name="td:merchantCategoryName">
+          <type>d:text</type>
+        </property>
+        <property name="td:sku">
+          <type>d:text</type>
+        </property>
+        <property name="td:shortDescription">
+          <type>d:text</type>
+        </property>
+        <property name="td:promoText">
+          <type>d:text</type>
+        </property>
+        <property name="td:previousPrice">
+          <type>d:text</type>
+        </property>
+        <property name="td:warranty">
+          <type>d:text</type>
+        </property>
+        <property name="td:availability">
+          <type>d:text</type>
+        </property>
+        <property name="td:inStock">
+          <type>d:text</type>
+        </property>
+        <property name="td:shippingCost">
+          <type>d:text</type>
+        </property>
+        <property name="td:deliveryTime">
+          <type>d:text</type>
+        </property>
+        <property name="td:weight">
+          <type>d:text</type>
+        </property>
+        <property name="td:size">
+          <type>d:text</type>
+        </property>
+        <property name="td:brand">
+          <type>d:text</type>
+        </property>
+        <property name="td:model">
+          <type>d:text</type>
+        </property>
+        <property name="td:ean">
+          <type>d:text</type>
+        </property>
+        <property name="td:upc">
+          <type>d:text</type>
+        </property>
+        <property name="td:isbn">
+          <type>d:text</type>
+        </property>
+        <property name="td:condition">
+          <type>d:text</type>
+        </property>
+        <property name="td:mpn">
+          <type>d:text</type>
+        </property>
+        <property name="td:techSpecs">
+          <type>d:text</type>
+        </property>
+        <property name="td:manufacturer">
+          <type>d:text</type>
+        </property>
+        <property name="td:programName">
+          <type>d:text</type>
+        </property>
+        <property name="td:programLogoPath">
+          <type>d:text</type>
+        </property>
+        <property name="td:programId">
+          <type>d:text</type>
+        </property>
+      </properties>
+    </type>
+  </types>
+</model>
