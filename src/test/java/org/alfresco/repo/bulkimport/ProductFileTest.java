@@ -32,7 +32,6 @@ public class ProductFileTest {
 
   static Logger log = Logger.getLogger(ProductFileTest.class);
   private static URL single = ClassLoader.getSystemClassLoader().getResource("tradedoubler-single.xml");
-  private static URL full = ClassLoader.getSystemClassLoader().getResource("tradedoubler.xml");
 
   protected static ApplicationContext applicationContext;
 
@@ -77,21 +76,14 @@ public class ProductFileTest {
     assertTrue(nodeService.exists(importedFolder));
 
     List<Source> sources = Arrays.asList(new Source[]{
-        new StreamSource(full.openStream())
+        new StreamSource(single.openStream())
     });
-    List<Object> unmarshalled = xmlBulkImporter.bulkImport(importedFolder, sources);
-    assertNotNull(unmarshalled);
-    assertNotSame(0, unmarshalled.size());
+    Products products = (Products)xmlBulkImporter.bulkImport(importedFolder, sources);
+    assertNotNull(products);
+    assertEquals(1, products.getProduct().size());
 
     List<FileInfo> children = fileFolderService.list(importedFolder);
     assertNotNull(children);
     marshaller.clearContents();
   }
-
-  public void unmarshalAllProducts() throws IOException {
-    Source source = new StreamSource(full.openStream());
-    Products products = (Products) marshaller.unmarshal(source);
-    assertEquals(99876, products.getProduct().size());
-  }
-
 }

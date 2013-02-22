@@ -5,3 +5,4 @@ target
 *.ipr
 *.iws
 .classpath
+/Users/mau/w/prj/alfresco-migration-preprocessor/src/test/resources/tradedoubler.xml
