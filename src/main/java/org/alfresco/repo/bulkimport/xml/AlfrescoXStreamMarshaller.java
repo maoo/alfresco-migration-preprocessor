@@ -48,7 +48,7 @@ public class AlfrescoXStreamMarshaller extends XStreamMarshaller {
   private void setAlfrescoConverter() {
     ConverterMatcher importableFileConverter = new ImportableFileConverter(this.fileImportRootLocation, mapper, serviceRegistry, assocsStack);
     ConverterMatcher mapEntryConverter = new MapEntryConverter();
-    ConverterMatcher[] converters = new ConverterMatcher[]{mapEntryConverter,importableFileConverter};
+    ConverterMatcher[] converters = new ConverterMatcher[]{mapEntryConverter, importableFileConverter};
     setConverters(converters);
   }
 

@@ -25,7 +25,7 @@ public class Product extends CmObject {
 // private String description;
 
   @XStreamConverter(MapEntryConverter.class)
-  private Map<String,String> fields;
+  private Map<String, String> fields;
 
   @NodeProperty
   @XStreamAlias("productUrl")

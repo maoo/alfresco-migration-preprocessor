@@ -8,7 +8,7 @@ import java.util.List;
 @XStreamAlias("products")
 public class Products {
 
-  @XStreamImplicit(itemFieldName="product")
+  @XStreamImplicit(itemFieldName = "product")
   private List<Product> product;
 
   public List<Product> getProduct() {

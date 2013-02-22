@@ -1,7 +1,9 @@
 package org.alfresco.repo.bulkimport.beans;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.alfresco.repo.bulkimport.annotations.*;
+import org.alfresco.repo.bulkimport.annotations.NodeAssociation;
+import org.alfresco.repo.bulkimport.annotations.NodeContentUrl;
+import org.alfresco.repo.bulkimport.annotations.NodeType;
 
 import java.util.List;
 

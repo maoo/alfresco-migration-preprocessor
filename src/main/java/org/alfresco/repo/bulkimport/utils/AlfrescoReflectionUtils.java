@@ -120,7 +120,7 @@ public class AlfrescoReflectionUtils {
       NodeAssociation nodeAssociation = field.getAnnotation(NodeAssociation.class);
       if (nodeAssociation != null) {
         String associationValuesFieldName = nodeAssociation.fieldName();
-        Field associationValuesField = getField(currentObject,associationValuesFieldName);
+        Field associationValuesField = getField(currentObject, associationValuesFieldName);
         if (associationValuesField == null) {
           IllegalStateException e = new IllegalStateException("Field " + associationValuesFieldName + " is null on object " + currentObject);
           AlfrescoFileImportUtils.handleException(currentObject, e);
@@ -159,7 +159,7 @@ public class AlfrescoReflectionUtils {
 
   private static Field getField(Object object, String fieldName) {
     List<Field> allFields = getAllFields(object);
-    for(Field field : allFields) {
+    for (Field field : allFields) {
       if (fieldName.equals(field.getName())) {
         return field;
       }

@@ -1,9 +1,8 @@
 package org.alfresco.repo.bulkimport.beans;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.alfresco.repo.bulkimport.annotations.*;
-
-import java.util.List;
+import org.alfresco.repo.bulkimport.annotations.NodeAspect;
+import org.alfresco.repo.bulkimport.annotations.NodeProperty;
 
 public class CmObject {
 

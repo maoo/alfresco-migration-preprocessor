@@ -8,7 +8,9 @@ import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
-import org.alfresco.service.cmr.repository.*;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
@@ -53,10 +55,8 @@ public class ProductFileTest {
     repositoryHelper = (Repository) applicationContext.getBean("repositoryHelper");
     fileFolderService = (FileFolderService) applicationContext.getBean("FileFolderService");
     contentService = (ContentService) applicationContext.getBean("ContentService");
-
     AuthenticationUtil.setFullyAuthenticatedUser(ADMIN_USER_NAME);
   }
-
 
   @Test
   public void unmarshalOneProduct() throws IOException {
@@ -78,7 +78,7 @@ public class ProductFileTest {
     List<Source> sources = Arrays.asList(new Source[]{
         new StreamSource(single.openStream())
     });
-    Products products = (Products)xmlBulkImporter.bulkImport(importedFolder, sources);
+    Products products = (Products) xmlBulkImporter.bulkImport(importedFolder, sources);
     assertNotNull(products);
     assertEquals(1, products.getProduct().size());
 
